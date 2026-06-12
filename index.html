@@ -9,10 +9,13 @@
 <body>
   <main>
     <section class="hero-image">
-      <img src="homepage.png" alt="The Real Football World Cup Pick'Em Challenge">
-      <div class="quick-buttons">
+      <img src="homepage.png" alt="The Real Football 2026 World Cup Pick'Em Challenge">
+
+      <div class="real-buttons">
         <a href="#join">Join Challenge</a>
         <a href="#leaderboard">Leaderboard</a>
+        <a href="#participants">Participants</a>
+        <a href="#rules">Rules</a>
       </div>
     </section>
 
@@ -44,7 +47,7 @@
       <div id="participantsData"></div>
     </section>
 
-    <section class="panel rules">
+    <section class="panel rules" id="rules">
       <h1>Rules</h1>
       <ul>
         <li>Entry is free.</li>
@@ -110,7 +113,7 @@
         loadParticipants();
         loadLeaderboard();
       } catch (err) {
-        message.textContent = "⚠️ Registration failed. This email may already be registered.";
+        message.textContent = "⚠️ Registration failed. This email may already be registered or database access needs one more setting.";
         message.className = "error";
         console.error(err);
       }
