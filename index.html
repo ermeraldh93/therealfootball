@@ -8,14 +8,22 @@
 </head>
 <body>
   <main>
-    <section class="hero-image">
-      <img src="homepage.png" alt="The Real Football 2026 World Cup Pick'Em Challenge">
+    <section class="poster-wrap">
+      <img class="poster" src="homepage.png" alt="The Real Football World Cup Pick'Em homepage">
 
+      <!-- Real invisible click zones over the picture menu -->
+      <a class="hotspot nav-home" href="#top" aria-label="Home"></a>
+      <a class="hotspot nav-rules" href="#rules" aria-label="Rules"></a>
+      <a class="hotspot nav-submit" href="#join" aria-label="Submit Picks"></a>
+      <a class="hotspot nav-leaderboard" href="#leaderboard" aria-label="Leaderboard"></a>
+      <a class="hotspot nav-view" href="#participants" aria-label="View Picks"></a>
+      <a class="hotspot nav-join" href="#join" aria-label="Join Now"></a>
+
+      <!-- Visible backup buttons -->
       <div class="real-buttons">
         <a href="#join">Join Challenge</a>
         <a href="#leaderboard">Leaderboard</a>
-        <a href="#participants">Participants</a>
-        <a href="#rules">Rules</a>
+        <a href="#participants">View Players</a>
       </div>
     </section>
 
@@ -88,7 +96,6 @@
 
     document.getElementById("joinForm").addEventListener("submit", async function(e) {
       e.preventDefault();
-
       const message = document.getElementById("formMessage");
       message.textContent = "Submitting...";
       message.className = "";
@@ -113,7 +120,7 @@
         loadParticipants();
         loadLeaderboard();
       } catch (err) {
-        message.textContent = "⚠️ Registration failed. This email may already be registered or database access needs one more setting.";
+        message.textContent = "⚠️ Registration failed. This email may already be registered or Supabase needs public access enabled.";
         message.className = "error";
         console.error(err);
       }
