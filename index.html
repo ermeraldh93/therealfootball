@@ -369,7 +369,7 @@ async function loadLeaderboard() {
 async function loadPublicPicks() {
   const el = document.getElementById("publicPicksData");
   el.innerHTML = "Loading...";
-  const res = await supabaseFetch("public_public_picks?select=*&order=match_number.asc");
+ const res = await supabaseFetch("public_picks?select=*&order=match_number.asc");
   const data = await res.json();
 
   if (!Array.isArray(data) || data.length === 0) {
