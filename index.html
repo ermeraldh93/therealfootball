@@ -1,12 +1,75 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>The Real Football</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The Real Football | 2026 World Cup Pick'Em</title>
+  <style>
+    * { box-sizing: border-box; }
+    html, body {
+      margin: 0;
+      background: #000;
+      font-family: Arial, sans-serif;
+    }
+    body {
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+    }
+    .page {
+      width: 100%;
+      max-width: 1200px;
+      background: #000;
+    }
+    img {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+    .buttons {
+      position: fixed;
+      right: 18px;
+      bottom: 18px;
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      z-index: 10;
+    }
+    .buttons a {
+      background: linear-gradient(180deg, #ffe78a, #c89518);
+      color: #000;
+      text-decoration: none;
+      padding: 12px 18px;
+      border-radius: 999px;
+      font-weight: 900;
+      box-shadow: 0 0 20px rgba(255, 215, 0, .45);
+      border: 2px solid #fff0b2;
+      text-transform: uppercase;
+      font-size: 14px;
+    }
+    @media (max-width: 700px) {
+      .buttons {
+        left: 10px;
+        right: 10px;
+        justify-content: center;
+      }
+      .buttons a {
+        flex: 1;
+        text-align: center;
+        font-size: 12px;
+        padding: 10px;
+      }
+    }
+  </style>
 </head>
-<body style="font-family: Arial; text-align:center; padding:50px;">
-  <h1>⚽ The Real Football</h1>
-  <h2>2026 World Cup Pick'Em Challenge</h2>
-  <p>Website under construction.</p>
+<body>
+  <main class="page">
+    <img src="homepage.png" alt="The Real Football 2026 World Cup Pick'Em Challenge homepage design" />
+  </main>
+
+  <div class="buttons">
+    <a href="#submit-picks">Submit Picks</a>
+    <a href="#leaderboard">Leaderboard</a>
+  </div>
 </body>
 </html>
