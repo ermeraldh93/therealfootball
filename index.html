@@ -19,7 +19,8 @@
           <a href="#submit-picks">Submit Picks</a>
           <a href="#leaderboard">Leaderboard</a>
           <a href="#participants">Players</a>
-          <a href="#rules">Rules</a>
+          <a href="#all-picks">Public Picks</a>
+          <a href="#admin">Admin</a>
         </nav>
       </header>
     </section>
@@ -40,7 +41,7 @@
 
     <section class="panel" id="submit-picks">
       <h1>Submit Picks</h1>
-      <p>Enter the same email you registered with, then choose one winner for each match.</p>
+      <p>Enter the same email you registered with, then choose one winner for each match. Locked matches cannot be changed.</p>
 
       <div class="pick-email-row">
         <input id="pickEmail" type="email" placeholder="Registered email" required>
@@ -67,9 +68,25 @@
 
     <section class="panel" id="all-picks">
       <h1>Public Picks</h1>
-      <p>Once picks are submitted, everyone can compare selections.</p>
+      <p>Everyone can compare selections once picks are submitted.</p>
       <button onclick="loadPublicPicks()">Refresh Public Picks</button>
       <div id="publicPicksData"></div>
+    </section>
+
+    <section class="panel" id="admin">
+      <h1>Admin Results</h1>
+      <p>Organizer only. Enter the winner after each match, then the leaderboard updates automatically.</p>
+
+      <div class="pick-email-row">
+        <input id="adminPassword" type="password" placeholder="Admin password">
+        <button onclick="unlockAdmin()">Unlock Admin</button>
+      </div>
+
+      <div id="adminMessage"></div>
+      <div id="adminArea" class="hidden">
+        <button onclick="loadAdminResults()">Load Result Entry</button>
+        <div id="adminResultsData"></div>
+      </div>
     </section>
 
     <section class="panel rules" id="rules">
@@ -77,8 +94,8 @@
       <ul>
         <li>Entry is free.</li>
         <li>Pick the winner only. No score predictions.</li>
-        <li>Group stage matches may include a draw option.</li>
-        <li>Knockout rounds are winner/advance only.</li>
+        <li>Group-stage matches may include a draw option.</li>
+        <li>Knockout rounds will be winner/advance only when added.</li>
         <li>Each correct pick earns 1 point.</li>
         <li>Highest score at the end wins the trophy.</li>
       </ul>
@@ -88,8 +105,26 @@
   <script>
     const SUPABASE_URL = "https://tgnwncfrlloiqdwrscok.supabase.co";
     const SUPABASE_KEY = "sb_publishable_iaJe2pMEkG4PvJKA1aoKtA_6DIq9zXy";
+    const ADMIN_PASSWORD = "ECNL2";
     let currentParticipant = null;
     let currentMatches = [];
+    let existingPickMap = {};
+
+    const flags = {
+      "Mexico":"🇲🇽","South Africa":"🇿🇦","South Korea":"🇰🇷","Czechia":"🇨🇿","Canada":"🇨🇦",
+      "Bosnia and Herzegovina":"🇧🇦","USA":"🇺🇸","Paraguay":"🇵🇾","Haiti":"🇭🇹","Scotland":"🏴󠁧󠁢󠁳󠁣󠁴󠁿",
+      "Australia":"🇦🇺","Türkiye":"🇹🇷","Brazil":"🇧🇷","Morocco":"🇲🇦","Qatar":"🇶🇦","Switzerland":"🇨🇭",
+      "Côte d'Ivoire":"🇨🇮","Ecuador":"🇪🇨","Germany":"🇩🇪","Curaçao":"🇨🇼","Netherlands":"🇳🇱",
+      "Japan":"🇯🇵","Sweden":"🇸🇪","Tunisia":"🇹🇳","Saudi Arabia":"🇸🇦","Uruguay":"🇺🇾",
+      "Spain":"🇪🇸","Cape Verde":"🇨🇻","Iran":"🇮🇷","New Zealand":"🇳🇿","Belgium":"🇧🇪","Egypt":"🇪🇬",
+      "France":"🇫🇷","Senegal":"🇸🇳","Iraq":"🇮🇶","Norway":"🇳🇴","Argentina":"🇦🇷","Algeria":"🇩🇿",
+      "Austria":"🇦🇹","Jordan":"🇯🇴","Ghana":"🇬🇭","Panama":"🇵🇦","England":"🏴","Croatia":"🇭🇷",
+      "Portugal":"🇵🇹","Congo DR":"🇨🇩","Uzbekistan":"🇺🇿","Colombia":"🇨🇴","Draw":"🤝"
+    };
+
+    function teamLabel(team) {
+      return `${flags[team] || "⚽"} ${escapeHtml(team)}`;
+    }
 
     async function supabaseFetch(path, options = {}) {
       return fetch(`${SUPABASE_URL}/rest/v1/${path}`, {
@@ -114,6 +149,12 @@
       }[s]));
     }
 
+    function isLocked(match) {
+      if (match.locked) return true;
+      if (!match.kickoff_time) return false;
+      return new Date(match.kickoff_time) <= new Date();
+    }
+
     document.getElementById("joinForm").addEventListener("submit", async function(e) {
       e.preventDefault();
       const message = document.getElementById("formMessage");
@@ -134,7 +175,7 @@
 
         if (!res.ok) throw new Error(await res.text());
 
-        message.textContent = "✅ Registered! Now go to Submit Picks.";
+        message.textContent = "🏆 Registered! Now go to Submit Picks.";
         message.className = "success";
         document.getElementById("pickEmail").value = payload.email;
         e.target.reset();
@@ -176,36 +217,49 @@
         const mRes = await supabaseFetch("matches?select=*&order=match_number.asc");
         currentMatches = await mRes.json();
 
+        const existingRes = await supabaseFetch(`picks?select=match_id,selected_team&participant_id=eq.${currentParticipant.id}`);
+        const existing = await existingRes.json();
+        existingPickMap = {};
+        if (Array.isArray(existing)) {
+          existing.forEach(p => existingPickMap[p.match_id] = p.selected_team);
+        }
+
         if (!Array.isArray(currentMatches) || currentMatches.length === 0) {
           msg.textContent = "No matches have been added yet.";
           msg.className = "error";
           return;
         }
 
-        msg.textContent = `Welcome, ${currentParticipant.name}. Make your picks below.`;
+        msg.textContent = `Welcome, ${currentParticipant.name}. Make or update your picks below.`;
         msg.className = "success";
 
         form.innerHTML = currentMatches.map(match => {
-          const drawOption = match.allow_draw ? `
-            <label class="choice">
-              <input type="radio" name="${match.id}" value="Draw">
-              <span>Draw</span>
-            </label>` : "";
+          const locked = isLocked(match);
+          const saved = existingPickMap[match.id] || "";
+          const lockText = locked ? `<span class="locked">🔒 Locked</span>` : `<span class="open">Open</span>`;
+          const kickoff = match.kickoff_time ? new Date(match.kickoff_time).toLocaleString() : "";
+
+          function choice(team) {
+            const checked = saved === team ? "checked" : "";
+            const disabled = locked ? "disabled" : "";
+            return `
+              <label class="choice">
+                <input type="radio" name="${match.id}" value="${escapeHtml(team)}" ${checked} ${disabled}>
+                <span>${teamLabel(team)}</span>
+              </label>`;
+          }
+
+          const drawOption = match.allow_draw ? choice("Draw") : "";
 
           return `
-            <div class="match-card">
-              <div class="match-title">Match ${match.match_number} • ${escapeHtml(match.round)}</div>
-              <div class="teams">${escapeHtml(match.team_a)} vs ${escapeHtml(match.team_b)}</div>
+            <div class="match-card ${locked ? "match-locked" : ""}">
+              <div class="match-title">Match ${match.match_number} • ${escapeHtml(match.group_name || match.round)} ${lockText}</div>
+              <div class="kickoff">${kickoff}</div>
+              <div class="teams">${teamLabel(match.team_a)} <span>vs</span> ${teamLabel(match.team_b)}</div>
               <div class="choices">
-                <label class="choice">
-                  <input type="radio" name="${match.id}" value="${escapeHtml(match.team_a)}">
-                  <span>${escapeHtml(match.team_a)}</span>
-                </label>
+                ${choice(match.team_a)}
                 ${drawOption}
-                <label class="choice">
-                  <input type="radio" name="${match.id}" value="${escapeHtml(match.team_b)}">
-                  <span>${escapeHtml(match.team_b)}</span>
-                </label>
+                ${choice(match.team_b)}
               </div>
             </div>`;
         }).join("") + `<button type="submit" class="submit-picks-btn">Save My Picks</button>`;
@@ -229,6 +283,7 @@
 
       const picks = [];
       for (const match of currentMatches) {
+        if (isLocked(match)) continue;
         const selected = document.querySelector(`input[name="${match.id}"]:checked`);
         if (selected) {
           picks.push({
@@ -240,7 +295,7 @@
       }
 
       if (picks.length === 0) {
-        msg.textContent = "Choose at least one pick before saving.";
+        msg.textContent = "Choose at least one open match before saving.";
         msg.className = "error";
         return;
       }
@@ -249,8 +304,14 @@
         msg.textContent = "Saving picks...";
         msg.className = "";
 
-        const res = await supabaseFetch("picks", {
+        const res = await fetch(`${SUPABASE_URL}/rest/v1/picks?on_conflict=participant_id,match_id`, {
           method: "POST",
+          headers: {
+            "apikey": SUPABASE_KEY,
+            "Authorization": `Bearer ${SUPABASE_KEY}`,
+            "Content-Type": "application/json",
+            "Prefer": "resolution=merge-duplicates,return=representation"
+          },
           body: JSON.stringify(picks)
         });
 
@@ -261,7 +322,7 @@
         loadPublicPicks();
       } catch (err) {
         console.error(err);
-        msg.textContent = "⚠️ Picks could not be saved. You may have already submitted, or database policy needs one more setting.";
+        msg.textContent = "⚠️ Picks could not be saved. Run the final Supabase policy/update SQL first.";
         msg.className = "error";
       }
     });
@@ -313,7 +374,7 @@
       el.innerHTML = "Loading...";
 
       try {
-        const res = await supabaseFetch("picks?select=match_id,selected_team,participants(name)&order=match_id.asc");
+        const res = await supabaseFetch("picks?select=match_id,selected_team,participants(name),matches(match_number,team_a,team_b)&order=match_id.asc");
         const data = await res.json();
 
         if (!Array.isArray(data) || data.length === 0) {
@@ -322,11 +383,95 @@
         }
 
         el.innerHTML = `<table><tr><th>Player</th><th>Match</th><th>Pick</th></tr>` +
-          data.map(p => `<tr><td>${escapeHtml(p.participants?.name || "Player")}</td><td>${escapeHtml(p.match_id)}</td><td>${escapeHtml(p.selected_team)}</td></tr>`).join("") +
+          data.map(p => {
+            const matchLabel = p.matches ? `M${p.matches.match_number}: ${teamLabel(p.matches.team_a)} vs ${teamLabel(p.matches.team_b)}` : escapeHtml(p.match_id);
+            return `<tr><td>${escapeHtml(p.participants?.name || "Player")}</td><td>${matchLabel}</td><td>${teamLabel(p.selected_team)}</td></tr>`;
+          }).join("") +
           `</table>`;
       } catch (err) {
         console.error(err);
         el.innerHTML = "<p>Could not load public picks yet.</p>";
+      }
+    }
+
+    function unlockAdmin() {
+      const msg = document.getElementById("adminMessage");
+      const password = document.getElementById("adminPassword").value;
+      if (password === ADMIN_PASSWORD) {
+        document.getElementById("adminArea").classList.remove("hidden");
+        msg.textContent = "✅ Admin unlocked.";
+        msg.className = "success";
+        loadAdminResults();
+      } else {
+        msg.textContent = "Wrong password.";
+        msg.className = "error";
+      }
+    }
+
+    async function loadAdminResults() {
+      const el = document.getElementById("adminResultsData");
+      el.innerHTML = "Loading result entry...";
+
+      try {
+        const [matchRes, resultRes] = await Promise.all([
+          supabaseFetch("matches?select=*&order=match_number.asc"),
+          supabaseFetch("results?select=match_id,winning_team")
+        ]);
+        const matches = await matchRes.json();
+        const results = await resultRes.json();
+        const resultMap = {};
+        if (Array.isArray(results)) results.forEach(r => resultMap[r.match_id] = r.winning_team);
+
+        el.innerHTML = matches.map(match => {
+          const current = resultMap[match.id] || "";
+          const options = [match.team_a, match.allow_draw ? "Draw" : null, match.team_b].filter(Boolean);
+          return `
+            <div class="admin-match">
+              <strong>M${match.match_number}:</strong> ${teamLabel(match.team_a)} vs ${teamLabel(match.team_b)}
+              <select id="result-${match.id}">
+                <option value="">No result yet</option>
+                ${options.map(o => `<option value="${escapeHtml(o)}" ${current === o ? "selected" : ""}>${flags[o] || "⚽"} ${escapeHtml(o)}</option>`).join("")}
+              </select>
+              <button onclick="saveResult('${match.id}')">Save Result</button>
+            </div>`;
+        }).join("");
+      } catch (err) {
+        console.error(err);
+        el.innerHTML = "<p>Could not load admin results.</p>";
+      }
+    }
+
+    async function saveResult(matchId) {
+      const msg = document.getElementById("adminMessage");
+      const value = document.getElementById(`result-${matchId}`).value;
+      if (!value) {
+        msg.textContent = "Pick a winner/draw first.";
+        msg.className = "error";
+        return;
+      }
+
+      try {
+        const payload = { match_id: matchId, winning_team: value };
+        const res = await fetch(`${SUPABASE_URL}/rest/v1/results?on_conflict=match_id`, {
+          method: "POST",
+          headers: {
+            "apikey": SUPABASE_KEY,
+            "Authorization": `Bearer ${SUPABASE_KEY}`,
+            "Content-Type": "application/json",
+            "Prefer": "resolution=merge-duplicates,return=representation"
+          },
+          body: JSON.stringify(payload)
+        });
+
+        if (!res.ok) throw new Error(await res.text());
+
+        msg.textContent = `✅ Result saved for ${matchId}.`;
+        msg.className = "success";
+        loadLeaderboard();
+      } catch (err) {
+        console.error(err);
+        msg.textContent = "⚠️ Could not save result. Run the final Supabase policy/update SQL first.";
+        msg.className = "error";
       }
     }
 
