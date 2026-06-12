@@ -358,7 +358,7 @@ async function loadLeaderboard() {
 async function loadPublicPicks() {
   const el = document.getElementById("publicPicksData");
   el.innerHTML = "Loading...";
-  const res = await supabaseFetch("picks?select=match_id,selected_team,participants(first_name,last_name,name),matches(match_number,team_a,team_b)&order=match_id.asc");
+  const res = await supabaseFetch("public_picks?select=*&order=match_number.asc");
   const data = await res.json();
   if (!Array.isArray(data) || data.length === 0) {
     el.innerHTML = "<p>No picks submitted yet.</p>";
@@ -366,8 +366,8 @@ async function loadPublicPicks() {
   }
   el.innerHTML = `<table><tr><th>Player</th><th>Match</th><th>Pick</th></tr>` +
     data.map(p => {
-      const matchLabel = p.matches ? `M${p.matches.match_number}: ${teamLabel(p.matches.team_a)} vs ${teamLabel(p.matches.team_b)}` : escapeHtml(p.match_id);
-      return `<tr><td>${escapeHtml(displayName(p.participants || {}))}</td><td>${matchLabel}</td><td>${teamLabel(p.selected_team)}</td></tr>`;
+      const matchLabel = `M${p.match_number}: ${teamLabel(p.team_a)} vs ${teamLabel(p.team_b)}`;
+return `<tr><td>${escapeHtml(p.player_name)}</td><td>${matchLabel}</td><td>${teamLabel(p.selected_team)}</td></tr>`;
     }).join("") +
     `</table>`;
 }
