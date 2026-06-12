@@ -7,30 +7,45 @@
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <nav class="real-nav">
-    <a href="#top">Home</a>
-    <a href="#join">Join</a>
-    <a href="#submit-picks">Submit Picks</a>
-    <a href="#all-picks">View Picks</a>
-    <a href="#leaderboard">Leaderboard</a>
-    <a href="#admin">Admin</a>
+  <nav class="top-nav">
+    <div class="logo">🏆 THE REAL FOOTBALL</div>
+    <div class="nav-links">
+      <a href="#top">Home</a>
+      <a href="#join">Join</a>
+      <a href="#how">How It Works</a>
+      <a href="#submit-picks">Submit Picks</a>
+      <a href="#leaderboard">Leaderboard</a>
+      <a href="#all-picks">View Picks</a>
+      <a href="#admin">Admin</a>
+    </div>
   </nav>
 
   <main>
     <section class="hero" id="top">
-      <img src="homepage.png" alt="The Real Football World Cup Pick'Em poster" />
+      <img src="hero.png" alt="The Real Football 2026 World Cup Pick'Em">
     </section>
 
-    <section class="panel" id="join">
-      <h1>Join</h1>
-      <p>Free entry. Winner-only picks. One champion wins the trophy and prize.</p>
+    <section class="intro panel" id="join">
+      <h1>Join The Challenge</h1>
+      <p>Free to play. Pick the winner of every match. Most correct picks wins the prize.</p>
       <form id="joinForm">
         <input id="name" placeholder="Player Name" required>
         <input id="email" type="email" placeholder="Email" required>
         <input id="team" placeholder="Team / Nickname optional">
-        <button type="submit">Register</button>
+        <button type="submit">Join Now</button>
       </form>
       <div id="formMessage"></div>
+    </section>
+
+    <section class="panel" id="how">
+      <h1>How It Works</h1>
+      <div class="steps">
+        <div class="step"><span>1</span><h3>Join</h3><p>Register with your name and email.</p></div>
+        <div class="step"><span>2</span><h3>Submit Picks</h3><p>Pick the winner of every World Cup match.</p></div>
+        <div class="step"><span>3</span><h3>View Picks</h3><p>See what everyone else selected.</p></div>
+        <div class="step"><span>4</span><h3>Leaderboard</h3><p>Track standings throughout the tournament.</p></div>
+        <div class="step"><span>5</span><h3>Win</h3><p>The participant with the most correct picks wins the prize.</p></div>
+      </div>
     </section>
 
     <section class="panel" id="submit-picks">
@@ -46,12 +61,14 @@
 
     <section class="panel" id="leaderboard">
       <h1>Leaderboard</h1>
+      <p>Live standings update when match results are entered.</p>
       <button onclick="loadLeaderboard()">Refresh Leaderboard</button>
       <div id="leaderboardData"></div>
     </section>
 
     <section class="panel" id="all-picks">
       <h1>View Picks</h1>
+      <p>Compare predictions with friends and competitors.</p>
       <button onclick="loadPublicPicks()">Refresh Picks</button>
       <div id="publicPicksData"></div>
     </section>
@@ -75,6 +92,12 @@
         <div id="adminResultsData"></div>
       </div>
     </section>
+
+    <footer>
+      <strong>The Real Football</strong><br>
+      2026 World Cup Pick'Em Challenge<br>
+      Free Entry • Winner Takes The Prize
+    </footer>
   </main>
 
 <script>
@@ -97,9 +120,7 @@ const flags = {
   "Portugal":"🇵🇹","Congo DR":"🇨🇩","Uzbekistan":"🇺🇿","Colombia":"🇨🇴","Draw":"🤝"
 };
 
-function teamLabel(team) {
-  return `${flags[team] || "⚽"} ${escapeHtml(team)}`;
-}
+function teamLabel(team) { return `${flags[team] || "⚽"} ${escapeHtml(team)}`; }
 
 async function supabaseFetch(path, options = {}) {
   return fetch(`${SUPABASE_URL}/rest/v1/${path}`, {
