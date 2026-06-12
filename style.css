@@ -1,44 +1,74 @@
 *{box-sizing:border-box}
-html,body{margin:0;background:#000;color:#fff;font-family:Arial,sans-serif;scroll-behavior:smooth}
-.poster-wrap{position:relative;max-width:1300px;margin:0 auto;background:#000}
-.poster{display:block;width:100%;height:auto}
 
-/* Invisible clickable zones over the poster navigation */
-.hotspot{position:absolute;z-index:30;display:block}
-.nav-home{left:22%;top:4.4%;width:7%;height:3%}
-.nav-rules{left:31%;top:4.4%;width:7%;height:3%}
-.nav-submit{left:42%;top:4.4%;width:11%;height:3%}
-.nav-leaderboard{left:56%;top:4.4%;width:12%;height:3%}
-.nav-view{left:70%;top:4.4%;width:10%;height:3%}
-.nav-join{left:84%;top:3.9%;width:11%;height:4%}
-
-/* Always-visible real buttons */
-.real-buttons{
-  position:fixed;
-  left:50%;
-  bottom:16px;
-  transform:translateX(-50%);
-  display:flex;
-  gap:10px;
-  z-index:9999;
-  flex-wrap:wrap;
-  justify-content:center;
-  width:92%;
-  pointer-events:auto;
+html,body{
+  margin:0;
+  background:#000;
+  color:#fff;
+  font-family:Arial,sans-serif;
+  scroll-behavior:smooth;
 }
-.real-buttons a,button{
+
+.poster-wrap{
+  position:relative;
+  max-width:1300px;
+  margin:0 auto;
+  background:#000;
+}
+
+.poster{
+  display:block;
+  width:100%;
+  height:auto;
+}
+
+/* This covers the fake non-clickable image menu with a real clickable menu */
+.real-nav{
+  position:absolute;
+  top:6.9%;
+  left:9.5%;
+  right:7%;
+  height:6.2%;
+  z-index:100;
+  background:linear-gradient(180deg,rgba(0,0,0,.98),rgba(0,0,0,.88));
+  border-bottom:2px solid rgba(247,201,72,.65);
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:0 28px;
+  gap:18px;
+}
+
+.brand{
+  color:#f7c948;
+  font-family:Impact,Haettenschweiler,'Arial Narrow Bold',sans-serif;
+  font-size:clamp(17px,2.4vw,34px);
+  white-space:nowrap;
+  text-shadow:0 0 16px rgba(247,201,72,.6);
+}
+
+nav{
+  display:flex;
+  align-items:center;
+  justify-content:flex-end;
+  gap:14px;
+  flex-wrap:wrap;
+}
+
+nav a,
+button{
   background:linear-gradient(180deg,#ffe78a,#c89518);
   color:#000;
   text-decoration:none;
-  padding:14px 20px;
+  padding:10px 14px;
   border-radius:999px;
   font-weight:900;
   border:2px solid #fff0b2;
   text-transform:uppercase;
-  box-shadow:0 0 22px rgba(255,215,0,.55);
+  box-shadow:0 0 18px rgba(255,215,0,.45);
   cursor:pointer;
-  font-size:15px;
+  font-size:clamp(10px,1.1vw,14px);
 }
+
 .panel{
   max-width:1050px;
   margin:32px auto;
@@ -48,6 +78,7 @@ html,body{margin:0;background:#000;color:#fff;font-family:Arial,sans-serif;scrol
   border-radius:20px;
   box-shadow:0 0 28px rgba(247,201,72,.22);
 }
+
 .panel h1{
   margin:0 0 10px;
   color:#f7c948;
@@ -56,8 +87,20 @@ html,body{margin:0;background:#000;color:#fff;font-family:Arial,sans-serif;scrol
   font-size:clamp(36px,5vw,64px);
   letter-spacing:1px;
 }
-.panel p,.panel li{font-size:18px;font-weight:700;line-height:1.5}
-form{display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:12px;margin-top:22px}
+
+.panel p,.panel li{
+  font-size:18px;
+  font-weight:700;
+  line-height:1.5;
+}
+
+form{
+  display:grid;
+  grid-template-columns:1fr 1fr 1fr auto;
+  gap:12px;
+  margin-top:22px;
+}
+
 input{
   padding:15px;
   border-radius:12px;
@@ -66,14 +109,75 @@ input{
   color:#fff;
   font-size:16px;
 }
-#formMessage{margin-top:15px;font-weight:900;font-size:18px}
-.success{color:#83ff8d}.error{color:#ff7676}
-table{width:100%;border-collapse:collapse;margin-top:18px;background:#080808;border-radius:12px;overflow:hidden}
-th,td{text-align:left;padding:14px;border-bottom:1px solid rgba(247,201,72,.25)}
-th{color:#f7c948;text-transform:uppercase}
-.rules{margin-bottom:90px}
-@media(max-width:850px){
-  form{grid-template-columns:1fr}
-  .real-buttons a{flex:1 1 30%;text-align:center;font-size:12px;padding:12px 8px}
-  .panel{margin:18px 12px;padding:22px}
+
+#formMessage{
+  margin-top:15px;
+  font-weight:900;
+  font-size:18px;
+}
+
+.success{color:#83ff8d}
+.error{color:#ff7676}
+
+table{
+  width:100%;
+  border-collapse:collapse;
+  margin-top:18px;
+  background:#080808;
+  border-radius:12px;
+  overflow:hidden;
+}
+
+th,td{
+  text-align:left;
+  padding:14px;
+  border-bottom:1px solid rgba(247,201,72,.25);
+}
+
+th{
+  color:#f7c948;
+  text-transform:uppercase;
+}
+
+.rules{
+  margin-bottom:90px;
+}
+
+@media(max-width:900px){
+  .real-nav{
+    position:sticky;
+    top:0;
+    left:0;
+    right:0;
+    height:auto;
+    padding:14px;
+    flex-direction:column;
+  }
+
+  .poster-wrap{
+    display:flex;
+    flex-direction:column;
+  }
+
+  .real-nav{
+    order:-1;
+  }
+
+  nav{
+    justify-content:center;
+  }
+
+  nav a{
+    flex:1 1 40%;
+    text-align:center;
+  }
+
+  form{
+    grid-template-columns:1fr;
+  }
+
+  .panel{
+    margin:18px 12px;
+    padding:22px;
+  }
 }
