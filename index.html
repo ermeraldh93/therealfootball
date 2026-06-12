@@ -2,74 +2,167 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>The Real Football | 2026 World Cup Pick'Em</title>
-  <style>
-    * { box-sizing: border-box; }
-    html, body {
-      margin: 0;
-      background: #000;
-      font-family: Arial, sans-serif;
-    }
-    body {
-      min-height: 100vh;
-      display: flex;
-      justify-content: center;
-    }
-    .page {
-      width: 100%;
-      max-width: 1200px;
-      background: #000;
-    }
-    img {
-      display: block;
-      width: 100%;
-      height: auto;
-    }
-    .buttons {
-      position: fixed;
-      right: 18px;
-      bottom: 18px;
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-      z-index: 10;
-    }
-    .buttons a {
-      background: linear-gradient(180deg, #ffe78a, #c89518);
-      color: #000;
-      text-decoration: none;
-      padding: 12px 18px;
-      border-radius: 999px;
-      font-weight: 900;
-      box-shadow: 0 0 20px rgba(255, 215, 0, .45);
-      border: 2px solid #fff0b2;
-      text-transform: uppercase;
-      font-size: 14px;
-    }
-    @media (max-width: 700px) {
-      .buttons {
-        left: 10px;
-        right: 10px;
-        justify-content: center;
-      }
-      .buttons a {
-        flex: 1;
-        text-align: center;
-        font-size: 12px;
-        padding: 10px;
-      }
-    }
-  </style>
+  <link rel="stylesheet" href="style.css"/>
 </head>
 <body>
-  <main class="page">
-    <img src="homepage.png" alt="The Real Football 2026 World Cup Pick'Em Challenge homepage design" />
-  </main>
+  <div class="flag-frame">
+    <div class="app">
+      <header>
+        <div class="brand">⚽ THE REAL FOOTBALL</div>
+        <nav>
+          <a href="#home">Home</a>
+          <a href="#join">Join</a>
+          <a href="#leaderboard">Leaderboard</a>
+          <a href="#picks">View Picks</a>
+          <a href="#rules">Rules</a>
+        </nav>
+      </header>
 
-  <div class="buttons">
-    <a href="#submit-picks">Submit Picks</a>
-    <a href="#leaderboard">Leaderboard</a>
+      <section class="hero" id="home">
+        <div class="hero-copy">
+          <h1>THE REAL<br><span>FOOTBALL</span></h1>
+          <h2>2026 World Cup Pick'Em Challenge</h2>
+          <p>Predict every match. Beat your friends. Become the champion.</p>
+          <a href="#join" class="gold-btn">🏆 Join the Challenge</a>
+          <div class="free">FREE TO PLAY • NO ENTRY FEE • WIN THE TROPHY</div>
+        </div>
+        <div class="hero-art">🏆⚽</div>
+      </section>
+
+      <section class="cards">
+        <div class="card">⚽<h3>Predict Every Match</h3><p>Pick winners from group stage to final.</p></div>
+        <div class="card">📊<h3>Live Leaderboard</h3><p>Track who is on top.</p></div>
+        <div class="card">👀<h3>View Everyone's Picks</h3><p>See what friends picked.</p></div>
+        <div class="card">🏆<h3>Winner Gets Trophy</h3><p>One champion. One trophy.</p></div>
+      </section>
+
+      <section class="panel" id="join">
+        <h2>Join the Challenge</h2>
+        <p class="muted">Enter your info. Pick submission comes next.</p>
+        <form id="joinForm">
+          <input id="name" placeholder="Player name" required />
+          <input id="email" type="email" placeholder="Parent/player email" required />
+          <input id="team" placeholder="Team name / nickname optional" />
+          <button type="submit">Submit Registration</button>
+        </form>
+        <div id="formMessage"></div>
+      </section>
+
+      <section class="panel" id="leaderboard">
+        <h2>Leaderboard</h2>
+        <button onclick="loadLeaderboard()">Refresh Leaderboard</button>
+        <div id="leaderboardData" class="table-wrap"></div>
+      </section>
+
+      <section class="panel" id="picks">
+        <h2>View Participants</h2>
+        <button onclick="loadParticipants()">Refresh Participants</button>
+        <div id="participantsData" class="table-wrap"></div>
+      </section>
+
+      <section class="panel" id="rules">
+        <h2>Rules</h2>
+        <ul>
+          <li>Entry is free.</li>
+          <li>Pick winners for World Cup matches.</li>
+          <li>Correct picks earn points.</li>
+          <li>The highest score wins the trophy.</li>
+          <li>Everyone can view each other's picks once submissions are live.</li>
+        </ul>
+      </section>
+
+      <footer>Think you know football? Prove it.</footer>
+    </div>
   </div>
+
+<script>
+const SUPABASE_URL = "https://tgnwncfrlloiqdwrscok.supabase.co";
+const SUPABASE_KEY = "sb_publishable_iaJe2pMEkG4PvJKA1aoKtA_6DIq9zXy";
+
+async function supabaseFetch(path, options = {}) {
+  return fetch(`${SUPABASE_URL}/rest/v1/${path}`, {
+    ...options,
+    headers: {
+      "apikey": SUPABASE_KEY,
+      "Authorization": `Bearer ${SUPABASE_KEY}`,
+      "Content-Type": "application/json",
+      "Prefer": "return=representation",
+      ...(options.headers || {})
+    }
+  });
+}
+
+document.getElementById("joinForm").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const message = document.getElementById("formMessage");
+  message.textContent = "Submitting...";
+  message.className = "";
+
+  const payload = {
+    name: document.getElementById("name").value.trim(),
+    email: document.getElementById("email").value.trim().toLowerCase(),
+    team_name: document.getElementById("team").value.trim()
+  };
+
+  try {
+    const res = await supabaseFetch("participants", {
+      method: "POST",
+      body: JSON.stringify(payload)
+    });
+
+    if (!res.ok) {
+      const error = await res.text();
+      throw new Error(error);
+    }
+
+    message.textContent = "✅ You are registered! Pick submission page is coming next.";
+    message.className = "success";
+    e.target.reset();
+    loadParticipants();
+    loadLeaderboard();
+  } catch (err) {
+    message.textContent = "⚠️ Registration failed. This email may already be registered.";
+    message.className = "error";
+    console.error(err);
+  }
+});
+
+async function loadParticipants() {
+  const el = document.getElementById("participantsData");
+  el.innerHTML = "Loading...";
+  const res = await supabaseFetch("participants?select=id,name,email,team_name,created_at&order=created_at.desc");
+  const data = await res.json();
+  if (!Array.isArray(data) || data.length === 0) {
+    el.innerHTML = "<p>No participants yet.</p>";
+    return;
+  }
+  el.innerHTML = `<table><tr><th>Name</th><th>Team/Nickname</th><th>Registered</th></tr>` +
+    data.map(p => `<tr><td>${escapeHtml(p.name)}</td><td>${escapeHtml(p.team_name || "")}</td><td>${new Date(p.created_at).toLocaleString()}</td></tr>`).join("") +
+    `</table>`;
+}
+
+async function loadLeaderboard() {
+  const el = document.getElementById("leaderboardData");
+  el.innerHTML = "Loading...";
+  const res = await supabaseFetch("leaderboard?select=*&order=correct_picks.desc");
+  const data = await res.json();
+  if (!Array.isArray(data) || data.length === 0) {
+    el.innerHTML = "<p>No scores yet.</p>";
+    return;
+  }
+  el.innerHTML = `<table><tr><th>Rank</th><th>Name</th><th>Points</th></tr>` +
+    data.map((p, i) => `<tr><td>${i+1}</td><td>${escapeHtml(p.name)}</td><td>${p.correct_picks}</td></tr>`).join("") +
+    `</table>`;
+}
+
+function escapeHtml(str) {
+  return String(str).replace(/[&<>"']/g, s => ({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#039;"}[s]));
+}
+
+loadParticipants();
+loadLeaderboard();
+</script>
 </body>
 </html>
