@@ -28,7 +28,24 @@
     <section class="hero" id="top">
       <img src="hero.png" alt="The Real Football 2026 World Cup Pick'Em">
     </section>
+<section class="panel" id="live-games">
+  <h1>Live World Cup Tracker</h1>
 
+  <api-sports-widget data-type="games"
+  data-games-style="2"
+  data-league="1"
+  data-tab="all"
+></api-sports-widget>
+
+<api-sports-widget data-type="config"
+  data-key="32d2e1bf2f37bcc02dd481877195c574"
+  data-sport="football"
+  data-lang="en"
+  data-theme="dark"
+  data-show-errors="true"
+  data-show-logos="true"
+></api-sports-widget>
+</section>
     <section class="panel" id="how">
       <h1>Rules & How It Works</h1>
       <div class="steps">
@@ -71,24 +88,7 @@
       <div id="pickMessage"></div>
       <form id="pickForm"></form>
     </section>
-<section class="panel" id="live-games">
-  <h1>Live World Cup Tracker</h1>
 
-  <api-sports-widget data-type="games"
-  data-games-style="2"
-  data-league="1"
-  data-tab="all"
-></api-sports-widget>
-
-<api-sports-widget data-type="config"
-  data-key="32d2e1bf2f37bcc02dd481877195c574"
-  data-sport="football"
-  data-lang="en"
-  data-theme="dark"
-  data-show-errors="true"
-  data-show-logos="true"
-></api-sports-widget>
-</section>
     <section class="panel" id="leaderboard">
       <h1>Leaderboard</h1>
       <p>Live standings update when match results are entered.</p>
