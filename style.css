@@ -3,6 +3,11 @@ html,body{margin:0;background:#050505;color:#fff;font-family:Arial,sans-serif;sc
 .top-nav{position:sticky;top:0;z-index:999;background:#050505;border-bottom:1px solid #c89518;display:flex;align-items:center;justify-content:space-between;gap:20px;padding:14px 24px;flex-wrap:wrap}
 .logo{font-family:Impact,Haettenschweiler,'Arial Narrow Bold',sans-serif;color:#f7c948;font-size:24px;letter-spacing:1px}
 .nav-links{display:flex;gap:10px;flex-wrap:wrap}
+.hamburger{display:none;width:46px;height:42px;padding:8px;border-radius:10px;background:linear-gradient(180deg,#ffe78a,#c89518);border:2px solid #fff0b2;box-shadow:0 0 18px rgba(255,215,0,.35);cursor:pointer}
+.hamburger span{display:block;height:3px;background:#000;margin:5px 0;border-radius:3px;transition:.2s}
+.hamburger.open span:nth-child(1){transform:translateY(8px) rotate(45deg)}
+.hamburger.open span:nth-child(2){opacity:0}
+.hamburger.open span:nth-child(3){transform:translateY(-8px) rotate(-45deg)}
 .nav-links a,button,.submit-picks-btn{background:linear-gradient(180deg,#ffe78a,#c89518);color:#000;text-decoration:none;padding:10px 16px;border-radius:999px;font-weight:900;border:2px solid #fff0b2;text-transform:uppercase;box-shadow:0 0 18px rgba(255,215,0,.35);cursor:pointer;font-size:13px}
 .hero{max-width:1200px;margin:0 auto;background:#000}
 .hero img{display:block;width:100%;height:auto}
@@ -27,4 +32,16 @@ input,select{padding:15px;border-radius:12px;border:1px solid rgba(247,201,72,.7
 table{width:100%;border-collapse:collapse;margin-top:18px;background:#080808;border-radius:12px;overflow:hidden}th,td{text-align:left;padding:14px;border-bottom:1px solid rgba(247,201,72,.25)}th{color:#f7c948;text-transform:uppercase}
 .admin-match{display:grid;grid-template-columns:1fr 220px auto;gap:10px;align-items:center;padding:12px;margin:10px 0;background:#080808;border:1px solid rgba(247,201,72,.35);border-radius:12px}
 footer{text-align:center;color:#f7c948;border-top:1px solid rgba(247,201,72,.35);padding:30px;margin-top:40px;line-height:1.6}
-@media(max-width:900px){.top-nav{justify-content:center}.logo{width:100%;text-align:center}.nav-links{justify-content:center}.nav-links a{flex:1 1 40%;text-align:center}form,.pick-email-row,.admin-match{grid-template-columns:1fr}.choices{grid-template-columns:1fr}.steps{grid-template-columns:1fr}.panel{margin:18px 12px;padding:22px}.hero{max-width:100%}}
+@media(max-width:900px){
+  .top-nav{justify-content:space-between;flex-wrap:nowrap;padding:12px 16px}
+  .logo{font-size:20px}
+  .hamburger{display:block;flex:0 0 auto}
+  .nav-links{display:none;position:absolute;top:67px;left:0;right:0;background:#050505;border-bottom:1px solid #c89518;padding:14px;box-shadow:0 12px 25px rgba(0,0,0,.75)}
+  .nav-links.open{display:grid;grid-template-columns:1fr;gap:10px}
+  .nav-links a{text-align:center;width:100%;padding:14px}
+  form,.pick-email-row,.admin-match{grid-template-columns:1fr}
+  .choices{grid-template-columns:1fr}
+  .steps{grid-template-columns:1fr}
+  .panel{margin:18px 12px;padding:22px}
+  .hero{max-width:100%}
+}

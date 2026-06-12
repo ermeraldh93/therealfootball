@@ -9,7 +9,14 @@
 <body>
   <nav class="top-nav">
     <div class="logo">🏆 THE REAL FOOTBALL</div>
-    <div class="nav-links">
+
+    <button class="hamburger" id="hamburgerBtn" aria-label="Open menu" aria-expanded="false">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+
+    <div class="nav-links" id="navLinks">
       <a href="#top">Home</a>
       <a href="#join">Join</a>
       <a href="#how">How It Works</a>
@@ -101,6 +108,23 @@
   </main>
 
 <script>
+const hamburgerBtn = document.getElementById("hamburgerBtn");
+const navLinks = document.getElementById("navLinks");
+
+hamburgerBtn.addEventListener("click", () => {
+  navLinks.classList.toggle("open");
+  hamburgerBtn.classList.toggle("open");
+  hamburgerBtn.setAttribute("aria-expanded", navLinks.classList.contains("open"));
+});
+
+document.querySelectorAll(".nav-links a").forEach(link => {
+  link.addEventListener("click", () => {
+    navLinks.classList.remove("open");
+    hamburgerBtn.classList.remove("open");
+    hamburgerBtn.setAttribute("aria-expanded", "false");
+  });
+});
+
 const SUPABASE_URL = "https://tgnwncfrlloiqdwrscok.supabase.co";
 const SUPABASE_KEY = "sb_publishable_iaJe2pMEkG4PvJKA1aoKtA_6DIq9zXy";
 const ADMIN_PASSWORD = "ECNL2";
