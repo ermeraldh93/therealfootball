@@ -1,9 +1,9 @@
 *{box-sizing:border-box}
 html,body{margin:0;background:#050505;color:#fff;font-family:Arial,sans-serif;scroll-behavior:smooth}
-.hero{position:relative;max-width:1500px;margin:0 auto;background:#000}
-.hero img{display:block;width:100%;height:auto}
 .real-nav{position:sticky;top:0;z-index:999;background:#050505;border-bottom:1px solid #c89518;display:flex;justify-content:center;gap:14px;padding:14px;flex-wrap:wrap}
 .real-nav a,button,.submit-picks-btn{background:linear-gradient(180deg,#ffe78a,#c89518);color:#000;text-decoration:none;padding:10px 16px;border-radius:999px;font-weight:900;border:2px solid #fff0b2;text-transform:uppercase;box-shadow:0 0 18px rgba(255,215,0,.35);cursor:pointer}
+.hero{max-width:1050px;margin:0 auto;background:#000}
+.hero img{display:block;width:100%;height:auto}
 .panel{max-width:1120px;margin:32px auto;padding:28px;background:radial-gradient(circle at top right,rgba(247,201,72,.18),transparent 30%),linear-gradient(180deg,#151515,#050505);border:1px solid rgba(247,201,72,.65);border-radius:18px;box-shadow:0 0 28px rgba(247,201,72,.13)}
 .panel h1{margin:0 0 10px;color:#f7c948;font-family:Impact,Haettenschweiler,'Arial Narrow Bold',sans-serif;text-transform:uppercase;font-size:clamp(36px,5vw,64px);letter-spacing:1px}
 .panel p,.panel li{font-size:18px;font-weight:700;line-height:1.5}
@@ -19,4 +19,4 @@ input,select{padding:15px;border-radius:12px;border:1px solid rgba(247,201,72,.7
 .submit-picks-btn{margin-top:18px;width:100%;font-size:18px;padding:15px}
 table{width:100%;border-collapse:collapse;margin-top:18px;background:#080808;border-radius:12px;overflow:hidden}th,td{text-align:left;padding:14px;border-bottom:1px solid rgba(247,201,72,.25)}th{color:#f7c948;text-transform:uppercase}
 .admin-match{display:grid;grid-template-columns:1fr 220px auto;gap:10px;align-items:center;padding:12px;margin:10px 0;background:#080808;border:1px solid rgba(247,201,72,.35);border-radius:12px}
-@media(max-width:900px){form,.pick-email-row,.admin-match{grid-template-columns:1fr}.choices{grid-template-columns:1fr}.panel{margin:18px 12px;padding:22px}.real-nav a{flex:1 1 40%;text-align:center}.hero img{min-height:420px;object-fit:cover;object-position:center top}}
+@media(max-width:900px){form,.pick-email-row,.admin-match{grid-template-columns:1fr}.choices{grid-template-columns:1fr}.panel{margin:18px 12px;padding:22px}.real-nav a{flex:1 1 40%;text-align:center}.hero{max-width:100%}}
