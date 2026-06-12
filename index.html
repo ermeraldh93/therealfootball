@@ -369,18 +369,55 @@ async function loadLeaderboard() {
 async function loadPublicPicks() {
   const el = document.getElementById("publicPicksData");
   el.innerHTML = "Loading...";
+
   const res = await supabaseFetch("public_picks?select=*&order=match_number.asc");
   const data = await res.json();
+
   if (!Array.isArray(data) || data.length === 0) {
     el.innerHTML = "<p>No picks submitted yet.</p>";
     return;
   }
-  el.innerHTML = `<table><tr><th>Player</th><th>Match</th><th>Pick</th></tr>` +
-    data.map(p => {
-      const matchLabel = `M${p.match_number}: ${teamLabel(p.team_a)} vs ${teamLabel(p.team_b)}`;
-return `<tr><td>${escapeHtml(p.player_name)}</td><td>${matchLabel}</td><td>${teamLabel(p.selected_team)}</td></tr>`;
-    }).join("") +
-    `</table>`;
+
+  const players = [...new Set(data.map(p => p.player_name))];
+
+  const matches = {};
+  data.forEach(p => {
+    const key = p.match_id;
+    if (!matches[key]) {
+      matches[key] = {
+        match_number: p.match_number,
+        team_a: p.team_a,
+        team_b: p.team_b,
+        picks: {}
+      };
+    }
+    matches[key].picks[p.player_name] = p.selected_team;
+  });
+
+  const rows = Object.values(matches)
+    .sort((a, b) => a.match_number - b.match_number)
+    .map(m => {
+      const matchLabel = `M${m.match_number}: ${teamLabel(m.team_a)} vs ${teamLabel(m.team_b)}`;
+
+      return `<tr>
+        <td>${matchLabel}</td>
+        ${players.map(player => `<td>${teamLabel(m.picks[player] || "-")}</td>`).join("")}
+      </tr>`;
+    })
+    .join("");
+
+  el.innerHTML = `
+    <div style="overflow-x:auto;">
+      <table>
+        <tr>
+          <th>Match</th>
+          ${players.map(player => `<th>${escapeHtml(player)}</th>`).join("")}
+        </tr>
+        ${rows}
+      </table>
+    </div>
+  `;
+}
 }
 
 function unlockAdmin() {
