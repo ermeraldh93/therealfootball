@@ -11,19 +11,16 @@
     <div class="logo">🏆 THE REAL FOOTBALL</div>
 
     <button class="hamburger" id="hamburgerBtn" aria-label="Open menu" aria-expanded="false">
-      <span></span>
-      <span></span>
-      <span></span>
+      <span></span><span></span><span></span>
     </button>
 
     <div class="nav-links" id="navLinks">
       <a href="#top">Home</a>
-      <a href="#join">Join</a>
       <a href="#how">How It Works</a>
+      <a href="#join">Join</a>
       <a href="#submit-picks">Submit Picks</a>
       <a href="#leaderboard">Leaderboard</a>
-      <a href="#all-picks">View Picks</a>
-      <a href="#admin">Admin</a>
+      <a href="#all-picks">Public Picks</a>
     </div>
   </nav>
 
@@ -32,34 +29,43 @@
       <img src="hero.png" alt="The Real Football 2026 World Cup Pick'Em">
     </section>
 
+    <section class="panel" id="how">
+      <h1>Rules & How It Works</h1>
+      <div class="steps">
+        <div class="step"><span>1</span><h3>Join</h3><p>Register with your first name, last name, and birth date.</p></div>
+        <div class="step"><span>2</span><h3>Submit Picks</h3><p>Pick the winner of every World Cup match.</p></div>
+        <div class="step"><span>3</span><h3>Follow</h3><p>Watch the tournament and track your score.</p></div>
+        <div class="step"><span>4</span><h3>Climb</h3><p>Every correct pick earns points on the leaderboard.</p></div>
+        <div class="step"><span>5</span><h3>Win</h3><p>Most correct picks wins the champion jersey prize.</p></div>
+      </div>
+    </section>
+
+    <section class="panel prize">
+      <h1>Grand Prize</h1>
+      <p class="prize-main">🏆 Official 2026 FIFA World Cup Champion Jersey</p>
+      <p>The participant with the most correct picks at the end of the tournament will receive the official jersey of the country that wins the 2026 FIFA World Cup.</p>
+      <p class="gold-line">FREE ENTRY • ONE CHAMPION • ONE PRIZE</p>
+    </section>
+
     <section class="intro panel" id="join">
       <h1>Join The Challenge</h1>
-      <p>Free to play. Pick the winner of every match. Most correct picks wins the prize.</p>
+      <p>Register with your first name, last name, and birth date to secure your spot.</p>
       <form id="joinForm">
-        <input id="name" placeholder="Player Name" required>
-        <input id="email" type="email" placeholder="Email" required>
-        <input id="team" placeholder="Team / Nickname optional">
+        <input id="firstName" placeholder="First Name" required>
+        <input id="lastName" placeholder="Last Name" required>
+        <input id="birthDate" type="date" required>
         <button type="submit">Join Now</button>
       </form>
       <div id="formMessage"></div>
     </section>
 
-    <section class="panel" id="how">
-      <h1>How It Works</h1>
-      <div class="steps">
-        <div class="step"><span>1</span><h3>Join</h3><p>Register with your name and email.</p></div>
-        <div class="step"><span>2</span><h3>Submit Picks</h3><p>Pick the winner of every World Cup match.</p></div>
-        <div class="step"><span>3</span><h3>View Picks</h3><p>See what everyone else selected.</p></div>
-        <div class="step"><span>4</span><h3>Leaderboard</h3><p>Track standings throughout the tournament.</p></div>
-        <div class="step"><span>5</span><h3>Win</h3><p>The participant with the most correct picks wins the prize.</p></div>
-      </div>
-    </section>
-
     <section class="panel" id="submit-picks">
       <h1>Submit Picks</h1>
-      <p>Enter the same email you registered with, then choose one winner for each match.</p>
-      <div class="pick-email-row">
-        <input id="pickEmail" type="email" placeholder="Registered email" required>
+      <p>Enter your first name, last name, and birth date, then choose one winner for each match.</p>
+      <div class="lookup-grid">
+        <input id="lookupFirstName" placeholder="First Name" required>
+        <input id="lookupLastName" placeholder="Last Name" required>
+        <input id="lookupBirthDate" type="date" required>
         <button onclick="loadPickForm()">Load Matches</button>
       </div>
       <div id="pickMessage"></div>
@@ -74,22 +80,22 @@
     </section>
 
     <section class="panel" id="all-picks">
-      <h1>View Picks</h1>
+      <h1>Public Picks</h1>
       <p>Compare predictions with friends and competitors.</p>
       <button onclick="loadPublicPicks()">Refresh Picks</button>
       <div id="publicPicksData"></div>
     </section>
 
-    <section class="panel" id="players">
-      <h1>Players</h1>
-      <button onclick="loadParticipants()">Refresh Players</button>
+    <section class="panel" id="participants">
+      <h1>Participants</h1>
+      <button onclick="loadParticipants()">Refresh Participants</button>
       <div id="participantsData"></div>
     </section>
 
     <section class="panel" id="admin">
-      <h1>Admin</h1>
+      <h1>Admin Access</h1>
       <p>Organizer only. Enter winners and the leaderboard updates automatically.</p>
-      <div class="pick-email-row">
+      <div class="lookup-grid">
         <input id="adminPassword" type="password" placeholder="Admin password">
         <button onclick="unlockAdmin()">Unlock Admin</button>
       </div>
@@ -103,7 +109,8 @@
     <footer>
       <strong>The Real Football</strong><br>
       2026 World Cup Pick'Em Challenge<br>
-      Free Entry • Winner Takes The Prize
+      Free Entry • One Champion • One Prize<br>
+      <a href="#admin">Admin Access</a>
     </footer>
   </main>
 
@@ -144,7 +151,19 @@ const flags = {
   "Portugal":"🇵🇹","Congo DR":"🇨🇩","Uzbekistan":"🇺🇿","Colombia":"🇨🇴","Draw":"🤝"
 };
 
-function teamLabel(team) { return `${flags[team] || "⚽"} ${escapeHtml(team)}`; }
+function normalizeName(str) {
+  return String(str || "").trim();
+}
+
+function escapeHtml(str) {
+  return String(str || "").replace(/[&<>"']/g, s => ({
+    "&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#039;"
+  }[s]));
+}
+
+function teamLabel(team) {
+  return `${flags[team] || "⚽"} ${escapeHtml(team)}`;
+}
 
 async function supabaseFetch(path, options = {}) {
   return fetch(`${SUPABASE_URL}/rest/v1/${path}`, {
@@ -159,16 +178,14 @@ async function supabaseFetch(path, options = {}) {
   });
 }
 
-function escapeHtml(str) {
-  return String(str || "").replace(/[&<>"']/g, s => ({
-    "&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#039;"
-  }[s]));
-}
-
 function isLocked(match) {
   if (match.locked) return true;
   if (!match.kickoff_time) return false;
   return new Date(match.kickoff_time) <= new Date();
+}
+
+function displayName(player) {
+  return `${player.first_name || ""} ${player.last_name || ""}`.trim() || player.name || "Player";
 }
 
 document.getElementById("joinForm").addEventListener("submit", async function(e) {
@@ -177,10 +194,15 @@ document.getElementById("joinForm").addEventListener("submit", async function(e)
   message.textContent = "Submitting...";
   message.className = "";
 
+  const firstName = normalizeName(document.getElementById("firstName").value);
+  const lastName = normalizeName(document.getElementById("lastName").value);
+  const birthDate = document.getElementById("birthDate").value;
+
   const payload = {
-    name: document.getElementById("name").value.trim(),
-    email: document.getElementById("email").value.trim().toLowerCase(),
-    team_name: document.getElementById("team").value.trim()
+    first_name: firstName,
+    last_name: lastName,
+    birth_date: birthDate,
+    name: `${firstName} ${lastName}`.trim()
   };
 
   try {
@@ -189,15 +211,19 @@ document.getElementById("joinForm").addEventListener("submit", async function(e)
       body: JSON.stringify(payload)
     });
     if (!res.ok) throw new Error(await res.text());
+
     message.textContent = "🏆 Registered! Now go to Submit Picks.";
     message.className = "success";
-    document.getElementById("pickEmail").value = payload.email;
+    document.getElementById("lookupFirstName").value = firstName;
+    document.getElementById("lookupLastName").value = lastName;
+    document.getElementById("lookupBirthDate").value = birthDate;
     e.target.reset();
     loadParticipants();
     loadLeaderboard();
   } catch (err) {
-    message.textContent = "⚠️ Registration failed. This email may already be registered.";
+    message.textContent = "⚠️ Registration failed. This player may already be registered.";
     message.className = "error";
+    console.error(err);
   }
 });
 
@@ -208,17 +234,22 @@ async function loadPickForm() {
   msg.textContent = "Loading matches...";
   msg.className = "";
 
-  const email = document.getElementById("pickEmail").value.trim().toLowerCase();
-  if (!email) {
-    msg.textContent = "Enter your registered email first.";
+  const firstName = normalizeName(document.getElementById("lookupFirstName").value);
+  const lastName = normalizeName(document.getElementById("lookupLastName").value);
+  const birthDate = document.getElementById("lookupBirthDate").value;
+
+  if (!firstName || !lastName || !birthDate) {
+    msg.textContent = "Enter first name, last name, and birth date first.";
     msg.className = "error";
     return;
   }
 
-  const pRes = await supabaseFetch(`participants?select=id,name,email&email=eq.${encodeURIComponent(email)}`);
+  const lookup = `participants?select=id,first_name,last_name,birth_date,name&first_name=ilike.${encodeURIComponent(firstName)}&last_name=ilike.${encodeURIComponent(lastName)}&birth_date=eq.${encodeURIComponent(birthDate)}`;
+  const pRes = await supabaseFetch(lookup);
   const participants = await pRes.json();
+
   if (!Array.isArray(participants) || participants.length === 0) {
-    msg.textContent = "No player found with that email. Register first.";
+    msg.textContent = "No player found. Please register first.";
     msg.className = "error";
     return;
   }
@@ -233,7 +264,7 @@ async function loadPickForm() {
   existingPickMap = {};
   if (Array.isArray(existing)) existing.forEach(p => existingPickMap[p.match_id] = p.selected_team);
 
-  msg.textContent = `Welcome, ${currentParticipant.name}. Make or update your picks below.`;
+  msg.textContent = `Welcome, ${displayName(currentParticipant)}. Make or update your picks below.`;
   msg.className = "success";
 
   form.innerHTML = currentMatches.map(match => {
@@ -299,14 +330,14 @@ document.getElementById("pickForm").addEventListener("submit", async function(e)
 async function loadParticipants() {
   const el = document.getElementById("participantsData");
   el.innerHTML = "Loading...";
-  const res = await supabaseFetch("participants?select=id,name,team_name,created_at&order=created_at.desc");
+  const res = await supabaseFetch("participants?select=id,first_name,last_name,birth_date,name,created_at&order=created_at.desc");
   const data = await res.json();
   if (!Array.isArray(data) || data.length === 0) {
-    el.innerHTML = "<p>No players yet.</p>";
+    el.innerHTML = "<p>No participants yet.</p>";
     return;
   }
-  el.innerHTML = `<table><tr><th>Name</th><th>Team / Nickname</th><th>Registered</th></tr>` +
-    data.map(p => `<tr><td>${escapeHtml(p.name)}</td><td>${escapeHtml(p.team_name)}</td><td>${new Date(p.created_at).toLocaleDateString()}</td></tr>`).join("") +
+  el.innerHTML = `<table><tr><th>Name</th><th>Registered</th></tr>` +
+    data.map(p => `<tr><td>${escapeHtml(displayName(p))}</td><td>${new Date(p.created_at).toLocaleDateString()}</td></tr>`).join("") +
     `</table>`;
 }
 
@@ -327,7 +358,7 @@ async function loadLeaderboard() {
 async function loadPublicPicks() {
   const el = document.getElementById("publicPicksData");
   el.innerHTML = "Loading...";
-  const res = await supabaseFetch("picks?select=match_id,selected_team,participants(name),matches(match_number,team_a,team_b)&order=match_id.asc");
+  const res = await supabaseFetch("picks?select=match_id,selected_team,participants(first_name,last_name,name),matches(match_number,team_a,team_b)&order=match_id.asc");
   const data = await res.json();
   if (!Array.isArray(data) || data.length === 0) {
     el.innerHTML = "<p>No picks submitted yet.</p>";
@@ -336,7 +367,7 @@ async function loadPublicPicks() {
   el.innerHTML = `<table><tr><th>Player</th><th>Match</th><th>Pick</th></tr>` +
     data.map(p => {
       const matchLabel = p.matches ? `M${p.matches.match_number}: ${teamLabel(p.matches.team_a)} vs ${teamLabel(p.matches.team_b)}` : escapeHtml(p.match_id);
-      return `<tr><td>${escapeHtml(p.participants?.name || "Player")}</td><td>${matchLabel}</td><td>${teamLabel(p.selected_team)}</td></tr>`;
+      return `<tr><td>${escapeHtml(displayName(p.participants || {}))}</td><td>${matchLabel}</td><td>${teamLabel(p.selected_team)}</td></tr>`;
     }).join("") +
     `</table>`;
 }
