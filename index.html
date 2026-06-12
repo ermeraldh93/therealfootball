@@ -15,9 +15,10 @@
         <div class="brand">⚽ THE REAL FOOTBALL</div>
         <nav>
           <a href="#top">Home</a>
-          <a href="#join">Join Challenge</a>
+          <a href="#join">Join</a>
+          <a href="#submit-picks">Submit Picks</a>
           <a href="#leaderboard">Leaderboard</a>
-          <a href="#participants">View Players</a>
+          <a href="#participants">Players</a>
           <a href="#rules">Rules</a>
         </nav>
       </header>
@@ -37,18 +38,38 @@
       <div id="formMessage"></div>
     </section>
 
+    <section class="panel" id="submit-picks">
+      <h1>Submit Picks</h1>
+      <p>Enter the same email you registered with, then choose one winner for each match.</p>
+
+      <div class="pick-email-row">
+        <input id="pickEmail" type="email" placeholder="Registered email" required>
+        <button onclick="loadPickForm()">Load Matches</button>
+      </div>
+
+      <div id="pickMessage"></div>
+      <form id="pickForm"></form>
+    </section>
+
     <section class="panel" id="leaderboard">
       <h1>Live Leaderboard</h1>
-      <p>Scores will update once match results are entered.</p>
+      <p>Scores update after match results are entered.</p>
       <button onclick="loadLeaderboard()">Refresh Leaderboard</button>
       <div id="leaderboardData"></div>
     </section>
 
     <section class="panel" id="participants">
-      <h1>Participants</h1>
+      <h1>Players</h1>
       <p>Everyone can see who has joined.</p>
-      <button onclick="loadParticipants()">Refresh Participants</button>
+      <button onclick="loadParticipants()">Refresh Players</button>
       <div id="participantsData"></div>
+    </section>
+
+    <section class="panel" id="all-picks">
+      <h1>Public Picks</h1>
+      <p>Once picks are submitted, everyone can compare selections.</p>
+      <button onclick="loadPublicPicks()">Refresh Public Picks</button>
+      <div id="publicPicksData"></div>
     </section>
 
     <section class="panel rules" id="rules">
@@ -56,8 +77,9 @@
       <ul>
         <li>Entry is free.</li>
         <li>Pick the winner only. No score predictions.</li>
-        <li>Group stage can include a draw option when match picks are added.</li>
+        <li>Group stage matches may include a draw option.</li>
         <li>Knockout rounds are winner/advance only.</li>
+        <li>Each correct pick earns 1 point.</li>
         <li>Highest score at the end wins the trophy.</li>
       </ul>
     </section>
@@ -66,6 +88,8 @@
   <script>
     const SUPABASE_URL = "https://tgnwncfrlloiqdwrscok.supabase.co";
     const SUPABASE_KEY = "sb_publishable_iaJe2pMEkG4PvJKA1aoKtA_6DIq9zXy";
+    let currentParticipant = null;
+    let currentMatches = [];
 
     async function supabaseFetch(path, options = {}) {
       return fetch(`${SUPABASE_URL}/rest/v1/${path}`, {
@@ -110,15 +134,135 @@
 
         if (!res.ok) throw new Error(await res.text());
 
-        message.textContent = "✅ Registered! Pick submission is coming next.";
+        message.textContent = "✅ Registered! Now go to Submit Picks.";
         message.className = "success";
+        document.getElementById("pickEmail").value = payload.email;
         e.target.reset();
         loadParticipants();
         loadLeaderboard();
       } catch (err) {
-        message.textContent = "⚠️ Registration failed. This email may already be registered or Supabase needs public access enabled.";
+        message.textContent = "⚠️ Registration failed. This email may already be registered.";
         message.className = "error";
         console.error(err);
+      }
+    });
+
+    async function loadPickForm() {
+      const msg = document.getElementById("pickMessage");
+      const form = document.getElementById("pickForm");
+      form.innerHTML = "";
+      msg.className = "";
+      msg.textContent = "Loading matches...";
+
+      const email = document.getElementById("pickEmail").value.trim().toLowerCase();
+      if (!email) {
+        msg.textContent = "Enter your registered email first.";
+        msg.className = "error";
+        return;
+      }
+
+      try {
+        const pRes = await supabaseFetch(`participants?select=id,name,email&email=eq.${encodeURIComponent(email)}`);
+        const participants = await pRes.json();
+
+        if (!Array.isArray(participants) || participants.length === 0) {
+          msg.textContent = "No player found with that email. Register first.";
+          msg.className = "error";
+          return;
+        }
+
+        currentParticipant = participants[0];
+
+        const mRes = await supabaseFetch("matches?select=*&order=match_number.asc");
+        currentMatches = await mRes.json();
+
+        if (!Array.isArray(currentMatches) || currentMatches.length === 0) {
+          msg.textContent = "No matches have been added yet.";
+          msg.className = "error";
+          return;
+        }
+
+        msg.textContent = `Welcome, ${currentParticipant.name}. Make your picks below.`;
+        msg.className = "success";
+
+        form.innerHTML = currentMatches.map(match => {
+          const drawOption = match.allow_draw ? `
+            <label class="choice">
+              <input type="radio" name="${match.id}" value="Draw">
+              <span>Draw</span>
+            </label>` : "";
+
+          return `
+            <div class="match-card">
+              <div class="match-title">Match ${match.match_number} • ${escapeHtml(match.round)}</div>
+              <div class="teams">${escapeHtml(match.team_a)} vs ${escapeHtml(match.team_b)}</div>
+              <div class="choices">
+                <label class="choice">
+                  <input type="radio" name="${match.id}" value="${escapeHtml(match.team_a)}">
+                  <span>${escapeHtml(match.team_a)}</span>
+                </label>
+                ${drawOption}
+                <label class="choice">
+                  <input type="radio" name="${match.id}" value="${escapeHtml(match.team_b)}">
+                  <span>${escapeHtml(match.team_b)}</span>
+                </label>
+              </div>
+            </div>`;
+        }).join("") + `<button type="submit" class="submit-picks-btn">Save My Picks</button>`;
+
+      } catch (err) {
+        console.error(err);
+        msg.textContent = "Could not load picks. Try refreshing.";
+        msg.className = "error";
+      }
+    }
+
+    document.getElementById("pickForm").addEventListener("submit", async function(e) {
+      e.preventDefault();
+      const msg = document.getElementById("pickMessage");
+
+      if (!currentParticipant) {
+        msg.textContent = "Load your matches first.";
+        msg.className = "error";
+        return;
+      }
+
+      const picks = [];
+      for (const match of currentMatches) {
+        const selected = document.querySelector(`input[name="${match.id}"]:checked`);
+        if (selected) {
+          picks.push({
+            participant_id: currentParticipant.id,
+            match_id: match.id,
+            selected_team: selected.value
+          });
+        }
+      }
+
+      if (picks.length === 0) {
+        msg.textContent = "Choose at least one pick before saving.";
+        msg.className = "error";
+        return;
+      }
+
+      try {
+        msg.textContent = "Saving picks...";
+        msg.className = "";
+
+        const res = await supabaseFetch("picks", {
+          method: "POST",
+          body: JSON.stringify(picks)
+        });
+
+        if (!res.ok) throw new Error(await res.text());
+
+        msg.textContent = `✅ Saved ${picks.length} pick(s)!`;
+        msg.className = "success";
+        loadPublicPicks();
+      } catch (err) {
+        console.error(err);
+        msg.textContent = "⚠️ Picks could not be saved. You may have already submitted, or database policy needs one more setting.";
+        msg.className = "error";
       }
     });
 
@@ -131,7 +275,7 @@
         const data = await res.json();
 
         if (!Array.isArray(data) || data.length === 0) {
-          el.innerHTML = "<p>No participants yet.</p>";
+          el.innerHTML = "<p>No players yet.</p>";
           return;
         }
 
@@ -139,7 +283,7 @@
           data.map(p => `<tr><td>${escapeHtml(p.name)}</td><td>${escapeHtml(p.team_name)}</td><td>${new Date(p.created_at).toLocaleDateString()}</td></tr>`).join("") +
           `</table>`;
       } catch (err) {
-        el.innerHTML = "<p>Could not load participants yet.</p>";
+        el.innerHTML = "<p>Could not load players yet.</p>";
       }
     }
 
@@ -164,8 +308,31 @@
       }
     }
 
+    async function loadPublicPicks() {
+      const el = document.getElementById("publicPicksData");
+      el.innerHTML = "Loading...";
+
+      try {
+        const res = await supabaseFetch("picks?select=match_id,selected_team,participants(name)&order=match_id.asc");
+        const data = await res.json();
+
+        if (!Array.isArray(data) || data.length === 0) {
+          el.innerHTML = "<p>No picks submitted yet.</p>";
+          return;
+        }
+
+        el.innerHTML = `<table><tr><th>Player</th><th>Match</th><th>Pick</th></tr>` +
+          data.map(p => `<tr><td>${escapeHtml(p.participants?.name || "Player")}</td><td>${escapeHtml(p.match_id)}</td><td>${escapeHtml(p.selected_team)}</td></tr>`).join("") +
+          `</table>`;
+      } catch (err) {
+        console.error(err);
+        el.innerHTML = "<p>Could not load public picks yet.</p>";
+      }
+    }
+
     loadParticipants();
     loadLeaderboard();
+    loadPublicPicks();
   </script>
 </body>
 </html>
