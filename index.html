@@ -96,7 +96,12 @@
       <button onclick="loadPublicPicks()">Refresh Picks</button>
       <div id="publicPicksData"></div>
     </section>
-
+<section class="panel" id="crowd-predictions">
+  <h1>🔥 Crowd Predictions</h1>
+  <p>See which teams everyone is picking and spot the lone wolf picks.</p>
+  <button onclick="loadCrowdPredictions()">Refresh Crowd Predictions</button>
+  <div id="crowdPredictionsData"></div>
+</section>
     <section class="panel" id="participants">
       <h1>Participants</h1>
       <button onclick="loadParticipants()">Refresh Participants</button>
@@ -384,7 +389,58 @@ async function loadPublicPicks() {
     }).join("") +
     `</table>`;
 }
+async function loadCrowdPredictions() {
+  const el = document.getElementById("crowdPredictionsData");
+  el.innerHTML = "Loading...";
 
+  const res = await supabaseFetch("public_picks?select=*&order=match_number.asc");
+  const data = await res.json();
+
+  if (!Array.isArray(data) || data.length === 0) {
+    el.innerHTML = "<p>No picks submitted yet.</p>";
+    return;
+  }
+
+  const matches = {};
+
+  data.forEach(p => {
+    const key = p.match_id;
+    if (!matches[key]) {
+      matches[key] = {
+        match_number: p.match_number,
+        team_a: p.team_a,
+        team_b: p.team_b,
+        picks: {}
+      };
+    }
+
+    matches[key].picks[p.selected_team] = matches[key].picks[p.selected_team] || [];
+    matches[key].picks[p.selected_team].push(p.player_name);
+  });
+
+  el.innerHTML = Object.values(matches)
+    .sort((a, b) => a.match_number - b.match_number)
+    .map(match => {
+      const total = Object.values(match.picks).reduce((sum, players) => sum + players.length, 0);
+
+      const picksHtml = Object.entries(match.picks)
+        .map(([team, players]) => {
+          const percent = Math.round((players.length / total) * 100);
+          const loneWolf = players.length === 1 ? ` 🐺 Lone Wolf: ${escapeHtml(players[0])}` : "";
+
+          return `<p><strong>${teamLabel(team)}</strong>: ${percent}% (${players.length} pick${players.length === 1 ? "" : "s"})${loneWolf}</p>`;
+        })
+        .join("");
+
+      return `
+        <div class="match-card">
+          <h3>M${match.match_number}: ${teamLabel(match.team_a)} vs ${teamLabel(match.team_b)}</h3>
+          ${picksHtml}
+        </div>
+      `;
+    })
+    .join("");
+}
 function unlockAdmin() {
   const msg = document.getElementById("adminMessage");
   if (document.getElementById("adminPassword").value === ADMIN_PASSWORD) {
@@ -452,6 +508,7 @@ async function saveResult(matchId) {
 loadParticipants();
 loadLeaderboard();
 loadPublicPicks();
+loadCrowdPredictions();
 </script>
  
 </body>
