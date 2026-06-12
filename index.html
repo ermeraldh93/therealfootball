@@ -385,35 +385,6 @@ async function loadPublicPicks() {
     `</table>`;
 }
 
-    matches[key].picks[p.player_name] = p.selected_team;
-  });
-
-  const rows = Object.values(matches)
-    .sort((a, b) => a.match_number - b.match_number)
-    .map(m => {
-      const matchLabel = `M${m.match_number}: ${teamLabel(m.team_a)} vs ${teamLabel(m.team_b)}`;
-
-      return `<tr>
-        <td>${matchLabel}</td>
-        ${players.map(player => `<td>${teamLabel(m.picks[player] || "-")}</td>`).join("")}
-      </tr>`;
-    })
-    .join("");
-
-  el.innerHTML = `
-    <div style="overflow-x:auto;">
-      <table>
-        <tr>
-          <th>Match</th>
-          ${players.map(player => `<th>${escapeHtml(player)}</th>`).join("")}
-        </tr>
-        ${rows}
-      </table>
-    </div>
-  `;
-}
-}
-
 function unlockAdmin() {
   const msg = document.getElementById("adminMessage");
   if (document.getElementById("adminPassword").value === ADMIN_PASSWORD) {
