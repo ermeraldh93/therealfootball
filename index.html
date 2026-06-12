@@ -369,7 +369,6 @@ async function loadLeaderboard() {
 async function loadPublicPicks() {
   const el = document.getElementById("publicPicksData");
   el.innerHTML = "Loading...";
-
   const res = await supabaseFetch("public_picks?select=*&order=match_number.asc");
   const data = await res.json();
 
@@ -378,19 +377,14 @@ async function loadPublicPicks() {
     return;
   }
 
-  const players = [...new Set(data.map(p => p.player_name))];
+  el.innerHTML = `<table><tr><th>Player</th><th>Match</th><th>Pick</th></tr>` +
+    data.map(p => {
+      const matchLabel = `M${p.match_number}: ${teamLabel(p.team_a)} vs ${teamLabel(p.team_b)}`;
+      return `<tr><td>${escapeHtml(p.player_name)}</td><td>${matchLabel}</td><td>${teamLabel(p.selected_team)}</td></tr>`;
+    }).join("") +
+    `</table>`;
+}
 
-  const matches = {};
-  data.forEach(p => {
-    const key = p.match_id;
-    if (!matches[key]) {
-      matches[key] = {
-        match_number: p.match_number,
-        team_a: p.team_a,
-        team_b: p.team_b,
-        picks: {}
-      };
-    }
     matches[key].picks[p.player_name] = p.selected_team;
   });
 
