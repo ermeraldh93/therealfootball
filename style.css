@@ -47,3 +47,73 @@ footer a{color:#f7c948}
   .panel{margin:18px 12px;padding:22px}
   .hero{max-width:100%}
 }
+.hidden {
+  display: none;
+}
+
+#chatToggle {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 65px;
+  height: 65px;
+  border-radius: 50%;
+  font-size: 26px;
+  z-index: 9999;
+  box-shadow: 0 0 20px rgba(255,215,0,.7);
+}
+
+#chatBadge {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  background: red;
+  color: white;
+  border-radius: 50%;
+  min-width: 22px;
+  height: 22px;
+  font-size: 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#chatPopup {
+  position: fixed;
+  bottom: 95px;
+  right: 20px;
+  width: 350px;
+  max-width: 90vw;
+  background: #080808;
+  border: 2px solid #f7c948;
+  border-radius: 16px;
+  z-index: 9999;
+  overflow: hidden;
+  box-shadow: 0 0 30px rgba(247,201,72,.4);
+}
+
+#chatHeader {
+  background: #111;
+  padding: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #333;
+}
+
+#chatMessages {
+  height: 300px;
+  overflow-y: auto;
+  padding: 10px;
+}
+
+#chatInputRow {
+  display: flex;
+  gap: 8px;
+  padding: 10px;
+  border-top: 1px solid #333;
+}
+
+#chatInputRow input {
+  flex: 1;
+}
