@@ -95,12 +95,9 @@
     </section>
 <section class="panel" id="goat-tracker">
   <h1>🐐 GOAT Tracker</h1>
-  <p>Bold picks. Big upsets = 1 🐐 Point</p>
-
- No GOAT points have been awarded yet.
-
-GOAT points are earned by correctly predicting major upsets that most players missed.
-  </div>
+  <p>Bold picks. Big upsets. 1 🐐 Point for correctly picking a winner that most players missed.</p>
+  <button onclick="loadGoatTracker()">Refresh GOAT Tracker</button>
+  <div id="goatTrackerData">GOAT points appear after match results are entered.</div>
 </section>
    
 <section class="panel" id="crowd-predictions">
@@ -395,6 +392,56 @@ async function loadPublicPicks() {
       return `<tr><td>${escapeHtml(p.player_name)}</td><td>${matchLabel}</td><td>${teamLabel(p.selected_team)}</td></tr>`;
     }).join("") +
     `</table>`;
+  async function loadGoatTracker() {
+  const el = document.getElementById("goatTrackerData");
+  el.innerHTML = "Loading GOAT points...";
+
+  const [picksRes, resultsRes] = await Promise.all([
+    supabaseFetch("public_picks?select=*"),
+    supabaseFetch("results?select=match_id,winning_team")
+  ]);
+
+  const picks = await picksRes.json();
+  const results = await resultsRes.json();
+
+  if (!Array.isArray(picks) || !Array.isArray(results)) {
+    el.innerHTML = "<p>No GOAT points yet.</p>";
+    return;
+  }
+
+  const goatPoints = {};
+
+  results.forEach(result => {
+    const matchPicks = picks.filter(p => p.match_id === result.match_id);
+    const winners = matchPicks.filter(p => p.selected_team === result.winning_team);
+
+    if (matchPicks.length === 0) return;
+
+    const percent = winners.length / matchPicks.length;
+
+    if (percent <= 0.25) {
+      winners.forEach(p => {
+        goatPoints[p.player_name] =
+          (goatPoints[p.player_name] || 0) + 1;
+      });
+    }
+  });
+
+  const leaders = Object.entries(goatPoints)
+    .sort((a,b) => b[1] - a[1]);
+
+  if (leaders.length === 0) {
+    el.innerHTML = "<p>No GOAT points awarded yet.</p>";
+    return;
+  }
+
+  el.innerHTML =
+    "<table><tr><th>Player</th><th>GOAT Points</th></tr>" +
+    leaders.map(([name,pts]) =>
+      `<tr><td>${escapeHtml(name)}</td><td>${"🐐".repeat(pts)} ${pts}</td></tr>`
+    ).join("") +
+    "</table>";
+}
 }
 async function loadCrowdPredictions() {
   const el = document.getElementById("crowdPredictionsData");
@@ -515,6 +562,7 @@ async function saveResult(matchId) {
 loadParticipants();
 loadLeaderboard();
 loadCrowdPredictions();
+loadGoatTracker();
 </script>
  
 </body>
