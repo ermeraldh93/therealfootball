@@ -504,12 +504,14 @@ async function loadCrowdPredictions() {
 
 const favoriteTeam = favorite ? favorite[0] : "-";
 const favoritePercent = favorite ? Math.round((favorite[1].length / total) * 100) : 0;
+const hasLoneWolf = Object.values(match.picks)
+  .some(players => players.length === 1);
 
 return `
   <details class="match-card">
     <summary>
       M${match.match_number}: ${teamLabel(match.team_a)} vs ${teamLabel(match.team_b)}
-      — 🔥 ${teamLabel(favoriteTeam)} ${favoritePercent}%
+     — 🔥 ${teamLabel(favoriteTeam)} ${favoritePercent}% ${hasLoneWolf ? "🐺" : ""}
     </summary>
     ${picksHtml}
   </details>
