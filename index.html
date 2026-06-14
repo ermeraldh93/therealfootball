@@ -111,23 +111,7 @@
   <button onclick="loadCrowdPredictions()">Refresh Crowd Predictions</button>
   <div id="crowdPredictionsData"></div>
 </section>
-    <section class="panel" id="chat">
-  <h1>💬 Team Chat</h1>
-
-  <p>Talk to your friends & Keep it fun.</p>
-
-  <div style="display:flex;gap:10px;margin-bottom:10px;flex-wrap:wrap;">
-    <input id="chatName" placeholder="Your name"
-      style="flex:1;padding:10px;border-radius:8px;">
-
-    <input id="chatMessage" placeholder="Type message..."
-      style="flex:3;padding:10px;border-radius:8px;">
-
-    <button onclick="sendChat()">Send</button>
-  </div>
-
-  <div id="chatMessages"></div>
-</section>
+    
     <section class="panel" id="participants">
       <h1>Participants</h1>
       <button onclick="loadParticipants()">Refresh Participants</button>
@@ -642,7 +626,9 @@ async function saveResult(matchId) {
   msg.className = "success";
   loadLeaderboard();
 }
-
+function toggleChat() {
+  document.getElementById("chatPopup").classList.toggle("hidden");
+}
 loadParticipants();
 loadLeaderboard();
 loadCrowdPredictions();
@@ -651,6 +637,23 @@ loadChat();
 
 setInterval(loadChat, 5000);
 </script>
- 
+ <button id="chatToggle" onclick="toggleChat()">
+  💬 <span id="chatBadge">0</span>
+</button>
+
+<div id="chatPopup" class="hidden">
+  <div id="chatHeader">
+    <strong>💬 Locker Room Chat</strong>
+    <button onclick="toggleChat()">✕</button>
+  </div>
+
+  <div id="chatMessages"></div>
+
+  <div id="chatInputRow">
+    <input id="chatName" placeholder="Your name">
+    <input id="chatMessage" placeholder="Type message...">
+    <button onclick="sendChat()">Send</button>
+  </div>
+</div>
 </body>
 </html>
