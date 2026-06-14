@@ -53,6 +53,24 @@
       <p class="gold-line">FREE ENTRY • ONE CHAMPION • ONE PRIZE</p>
     </section>
 
+  <section class="panel" id="leaderboard">
+      <h1>Leaderboard</h1>
+      <p>Live standings update when match results are entered.</p>
+      <button onclick="loadLeaderboard()">Refresh Leaderboard</button>
+      <div id="leaderboardData"></div>
+    </section>
+<section class="panel" id="goat-tracker">
+  <h1>🐐 GOAT Tracker</h1>
+ <div style="margin-bottom:12px;">
+  <strong>🐐 GOAT Rules - 🐐's will be used for tiebreaker</strong><br>
+  🏆 Correct Pick = 1 Point<br>
+  🐐 Underdog Winner (≤25% picked) = 🐐<br>
+  🐺 Lone Wolf Winner (only 1 player picked it) = 🐐🐐🐐
+</div>
+  <button onclick="loadGoatTracker()">Refresh GOAT Tracker</button>
+  <div id="goatTrackerData">GOAT points appear after match results are entered.</div>
+</section>
+    
     <section class="intro panel" id="join">
       <h1>Join The Challenge</h1>
       <p>Register with your first name, last name, and birth date to secure your spot.</p>
@@ -78,23 +96,7 @@
       <form id="pickForm"></form>
     </section>
 
-    <section class="panel" id="leaderboard">
-      <h1>Leaderboard</h1>
-      <p>Live standings update when match results are entered.</p>
-      <button onclick="loadLeaderboard()">Refresh Leaderboard</button>
-      <div id="leaderboardData"></div>
-    </section>
-<section class="panel" id="goat-tracker">
-  <h1>🐐 GOAT Tracker</h1>
- <div style="margin-bottom:12px;">
-  <strong>🐐 GOAT Rules - 🐐's will be used for tiebreaker</strong><br>
-  🏆 Correct Pick = 1 Point<br>
-  🐐 Underdog Winner (≤25% picked) = 🐐<br>
-  🐺 Lone Wolf Winner (only 1 player picked it) = 🐐🐐🐐
-</div>
-  <button onclick="loadGoatTracker()">Refresh GOAT Tracker</button>
-  <div id="goatTrackerData">GOAT points appear after match results are entered.</div>
-</section>
+  
    
 <section class="panel" id="crowd-predictions">
   <h1>🔥 Crowd Predictions</h1>
