@@ -360,7 +360,8 @@ async function loadChat() {
   );
 
   const data = await res.json();
-
+const badge = document.getElementById("chatBadge");
+if (badge) badge.textContent = data.length;
   el.innerHTML = data.reverse().map(msg => `
     <div style="padding:8px;border-bottom:1px solid #333;">
       <strong>${escapeHtml(msg.player_name)}</strong><br>
@@ -628,6 +629,7 @@ async function saveResult(matchId) {
 }
 function toggleChat() {
   document.getElementById("chatPopup").classList.toggle("hidden");
+  document.getElementById("chatBadge").textContent = "0";
 }
 loadParticipants();
 loadLeaderboard();
