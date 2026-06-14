@@ -392,6 +392,7 @@ async function loadPublicPicks() {
       return `<tr><td>${escapeHtml(p.player_name)}</td><td>${matchLabel}</td><td>${teamLabel(p.selected_team)}</td></tr>`;
     }).join("") +
     `</table>`;
+  }
   async function loadGoatTracker() {
   const el = document.getElementById("goatTrackerData");
   el.innerHTML = "Loading GOAT points...";
