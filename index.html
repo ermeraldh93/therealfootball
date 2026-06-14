@@ -111,6 +111,23 @@
   <button onclick="loadCrowdPredictions()">Refresh Crowd Predictions</button>
   <div id="crowdPredictionsData"></div>
 </section>
+    <section class="panel" id="chat">
+  <h1>💬 Locker Room Chat</h1>
+
+  <p>Talk trash. Predict upsets. Keep it fun.</p>
+
+  <div style="display:flex;gap:10px;margin-bottom:10px;flex-wrap:wrap;">
+    <input id="chatName" placeholder="Your name"
+      style="flex:1;padding:10px;border-radius:8px;">
+
+    <input id="chatMessage" placeholder="Type message..."
+      style="flex:3;padding:10px;border-radius:8px;">
+
+    <button onclick="sendChat()">Send</button>
+  </div>
+
+  <div id="chatMessages"></div>
+</section>
     <section class="panel" id="participants">
       <h1>Participants</h1>
       <button onclick="loadParticipants()">Refresh Participants</button>
@@ -351,7 +368,41 @@ document.getElementById("pickForm").addEventListener("submit", async function(e)
   msg.className = "success";
   loadPublicPicks();
 });
+async function loadChat() {
+  const el = document.getElementById("chatMessages");
 
+  const res = await supabaseFetch(
+    "chat_messages?select=*&order=created_at.desc&limit=50"
+  );
+
+  const data = await res.json();
+
+  el.innerHTML = data.reverse().map(msg => `
+    <div style="padding:8px;border-bottom:1px solid #333;">
+      <strong>${escapeHtml(msg.name)}</strong><br>
+      ${escapeHtml(msg.message)}
+    </div>
+  `).join("");
+}
+
+async function sendChat() {
+  const name = document.getElementById("chatName").value.trim();
+  const message = document.getElementById("chatMessage").value.trim();
+
+  if (!name || !message) return;
+
+  await supabaseFetch("chat_messages", {
+    method: "POST",
+    body: JSON.stringify({
+      name,
+      message
+    })
+  });
+
+  document.getElementById("chatMessage").value = "";
+
+  loadChat();
+}
 async function loadParticipants() {
   const el = document.getElementById("participantsData");
   el.innerHTML = "Loading...";
@@ -596,6 +647,9 @@ loadParticipants();
 loadLeaderboard();
 loadCrowdPredictions();
 loadGoatTracker();
+loadChat();
+
+setInterval(loadChat, 5000);
 </script>
  
 </body>
