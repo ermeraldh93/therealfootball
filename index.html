@@ -70,6 +70,27 @@
   <button onclick="loadGoatTracker()">Refresh GOAT Tracker</button>
   <div id="goatTrackerData">GOAT points appear after match results are entered.</div>
 </section>
+
+<section class="panel" id="crowd-predictions">
+  <h1>🔥 Crowd Predictions</h1>
+  <p>Click on any match below to see which teams everyone is picking and spot the lone wolf.</p>
+  <button onclick="loadCrowdPredictions()">Refresh Crowd Predictions</button>
+  <div id="crowdPredictionsData"></div>
+</section>
+
+<section class="panel" id="submit-picks">
+      <h1>Submit/Load Picks</h1>
+      <p>Enter your first name, last name, and birth date, then choose one winner for each match.</p>
+      <div class="lookup-grid">
+        <input id="lookupFirstName" placeholder="First Name" required>
+        <input id="lookupLastName" placeholder="Last Name" required>
+        <input id="lookupBirthDate" type="date" required>
+        <button onclick="loadPickForm()">Load Matches</button>
+      </div>
+      <div id="pickMessage"></div>
+      <form id="pickForm"></form>
+    </section>
+
     
     <section class="intro panel" id="join">
       <h1>Join The Challenge</h1>
@@ -83,28 +104,9 @@
       <div id="formMessage"></div>
     </section>
 
-    <section class="panel" id="submit-picks">
-      <h1>Submit Picks</h1>
-      <p>Enter your first name, last name, and birth date, then choose one winner for each match.</p>
-      <div class="lookup-grid">
-        <input id="lookupFirstName" placeholder="First Name" required>
-        <input id="lookupLastName" placeholder="Last Name" required>
-        <input id="lookupBirthDate" type="date" required>
-        <button onclick="loadPickForm()">Load Matches</button>
-      </div>
-      <div id="pickMessage"></div>
-      <form id="pickForm"></form>
-    </section>
+    
+  
 
-  
-   
-<section class="panel" id="crowd-predictions">
-  <h1>🔥 Crowd Predictions</h1>
-  <p>Click on any match below to see which teams everyone is picking and spot the lone wolf.</p>
-  <button onclick="loadCrowdPredictions()">Refresh Crowd Predictions</button>
-  <div id="crowdPredictionsData"></div>
-</section>
-  
 
     <section class="panel" id="admin">
       <h1>Admin Access</h1>
