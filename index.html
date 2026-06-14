@@ -437,11 +437,17 @@ async function loadPublicPicks() {
   }
 
   el.innerHTML =
-    "<table><tr><th>Player</th><th>GOAT Points</th></tr>" +
-    leaders.map(([name,pts]) =>
-      `<tr><td>${escapeHtml(name)}</td><td>${"🐐".repeat(pts)} ${pts}</td></tr>`
-    ).join("") +
-    "</table>";
+  `<div class="goat-board">` +
+  leaders.map(([name, pts], i) => {
+    const rank = i === 0 ? "🥇" : i === 1 ? "🥈" : i === 2 ? "🥉" : `${i + 1}.`;
+    return `
+      <div class="match-card">
+        <h3>${rank} ${escapeHtml(name)} ${"🐐".repeat(pts)}</h3>
+        <p>${pts} GOAT Point${pts === 1 ? "" : "s"}</p>
+      </div>
+    `;
+  }).join("") +
+  `</div>`;
 }
 async function loadCrowdPredictions() {
   const el = document.getElementById("crowdPredictionsData");
