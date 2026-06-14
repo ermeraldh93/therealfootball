@@ -79,10 +79,10 @@ footer a{color:#f7c948}
 #chatPopup{
   position:fixed;
   right:18px;
-  bottom:92px;
-  width:450px;
+  bottom:20px;
+  width:420px;
   max-width:calc(100vw - 36px);
-  height:560px;
+  height:520px;
   background:#fff;
   color:#111;
   border:2px solid #f7c948;
