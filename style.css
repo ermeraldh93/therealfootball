@@ -51,8 +51,8 @@ footer a{color:#f7c948}
 
 #chatToggle{
   position:fixed;
-  bottom:20px;
-  right:20px;
+  bottom:18px;
+  right:18px;
   width:64px;
   height:64px;
   border-radius:50%;
@@ -80,9 +80,9 @@ footer a{color:#f7c948}
   position:fixed;
   right:18px;
   bottom:92px;
-  width:390px;
+  width:450px;
   max-width:calc(100vw - 36px);
-  height:470px;
+  height:650px;
   background:#fff;
   color:#111;
   border:2px solid #f7c948;
@@ -124,7 +124,8 @@ footer a{color:#f7c948}
   border-top:1px solid #ddd;
 }
 
-#chatInputRow input{
+#chatInputRow input,
+#chatInputRow textarea{
   width:100%;
   min-width:0;
   padding:14px;
@@ -135,6 +136,11 @@ footer a{color:#f7c948}
   background:#fff;
 }
 
+#chatInputRow textarea{
+  min-height:75px;
+  resize:none;
+}
+
 #chatInputRow button{
   padding:12px 18px;
   font-weight:800;
@@ -142,13 +148,42 @@ footer a{color:#f7c948}
 
 @media(max-width:600px){
   #chatPopup{
-    right:10px;
+    top:70px;
     left:10px;
+    right:10px;
+    bottom:10px;
     width:auto;
-    height:430px;
+    height:auto;
+    max-width:none;
+    border-radius:18px;
+  }
+
+  #chatMessages{
+    padding:12px;
   }
 
   #chatInputRow{
     grid-template-columns:1fr;
+    gap:8px;
+    padding:10px;
+  }
+
+  #chatInputRow input,
+  #chatInputRow textarea{
+    font-size:16px;
+    padding:14px;
+  }
+
+  #chatInputRow button{
+    width:100%;
+    padding:14px;
+  }
+
+  #chatToggle{
+    width:60px;
+    height:60px;
+    font-size:24px;
+    bottom:15px;
+    right:15px;
   }
 }
