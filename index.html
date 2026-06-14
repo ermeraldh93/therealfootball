@@ -499,11 +499,20 @@ async function loadCrowdPredictions() {
         })
         .join("");
 
-      return `
-        <div class="match-card">
-          <h3>M${match.match_number}: ${teamLabel(match.team_a)} vs ${teamLabel(match.team_b)}</h3>
-          ${picksHtml}
-        </div>
+      const favorite = Object.entries(match.picks)
+  .sort((a, b) => b[1].length - a[1].length)[0];
+
+const favoriteTeam = favorite ? favorite[0] : "-";
+const favoritePercent = favorite ? Math.round((favorite[1].length / total) * 100) : 0;
+
+return `
+  <details class="match-card">
+    <summary>
+      M${match.match_number}: ${teamLabel(match.team_a)} vs ${teamLabel(match.team_b)}
+      — 🔥 ${teamLabel(favoriteTeam)} ${favoritePercent}%
+    </summary>
+    ${picksHtml}
+  </details>
       `;
     })
     .join("");
