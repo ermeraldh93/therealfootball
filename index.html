@@ -426,11 +426,15 @@ async function loadPublicPicks() {
     const percent = winners.length / matchPicks.length;
 
     if (percent <= 0.25) {
-      winners.forEach(p => {
-        goatPoints[p.player_name] =
-          (goatPoints[p.player_name] || 0) + 1;
-      });
+  winners.forEach(p => {
+    goatPoints[p.player_name] =
+      (goatPoints[p.player_name] || 0) + 1;
+
+    if (winners.length === 1) {
+      goatPoints[p.player_name] += 2;
     }
+  });
+}
   });
 
   const leaders = Object.entries(goatPoints)
