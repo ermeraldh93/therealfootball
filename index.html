@@ -454,7 +454,15 @@ async function loadLeaderboard() {
       }
     });
   }
+const manualRes = await supabaseFetch("manual_goat_points?select=player_name,points");
+const manualPoints = await manualRes.json();
 
+if (Array.isArray(manualPoints)) {
+  manualPoints.forEach(row => {
+    goatPoints[row.player_name] =
+      (goatPoints[row.player_name] || 0) + Number(row.points || 0);
+  });
+}
   if (!Array.isArray(data) || data.length === 0) {
     el.innerHTML = "<p>No scores yet.</p>";
     return;
