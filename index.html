@@ -213,7 +213,17 @@ document.getElementById("joinForm").addEventListener("submit", async function(e)
   const firstName = normalizeName(document.getElementById("firstName").value);
   const lastName = normalizeName(document.getElementById("lastName").value);
   const birthDate = document.getElementById("birthDate").value;
+const existingRes = await supabaseFetch(
+  `participants?first_name=eq.${encodeURIComponent(firstName)}&last_name=eq.${encodeURIComponent(lastName)}`
+);
 
+const existing = await existingRes.json();
+
+if (Array.isArray(existing) && existing.length > 0) {
+  msg.textContent = "⚠️ This participant is already registered. Use Submit Picks to load your matches.";
+  msg.className = "error";
+  return;
+}
   const payload = {
     first_name: firstName,
     last_name: lastName,
