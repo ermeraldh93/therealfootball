@@ -538,7 +538,15 @@ async function loadPublicPicks() {
   });
 }
   });
+const manualRes = await supabaseFetch("manual_goat_points?select=player_name,points");
+const manualPoints = await manualRes.json();
 
+if (Array.isArray(manualPoints)) {
+  manualPoints.forEach(row => {
+    goatPoints[row.player_name] =
+      (goatPoints[row.player_name] || 0) + Number(row.points || 0);
+  });
+}
   const leaders = Object.entries(goatPoints)
     .sort((a,b) => b[1] - a[1]);
 
