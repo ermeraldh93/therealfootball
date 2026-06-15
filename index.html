@@ -369,7 +369,7 @@ document.getElementById("pickForm").addEventListener("submit", async function(e)
 });
 async function loadChat() {
   const el = document.getElementById("chatMessages");
-
+if (!el) return;
   const res = await supabaseFetch(
     "chat_messages?select=*&order=created_at.desc&limit=50"
   );
