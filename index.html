@@ -400,12 +400,12 @@ async function sendChat() {
   const res = await supabaseFetch("chat_messages", {
     method: "POST",
     body: JSON.stringify({
-  player_name: name,
-  message: message
-})
-    console.log("Chat response:", res);
+      player_name: name,
+      message: message
     })
   });
+
+  console.log("Chat response:", res);
 
   if (!res.ok) {
     const errorText = await res.text();
@@ -417,6 +417,7 @@ async function sendChat() {
   messageInput.value = "";
   await loadChat();
 }
+
 async function loadParticipants() {
   const el = document.getElementById("participantsData");
   el.innerHTML = "Loading...";
