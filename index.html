@@ -386,22 +386,36 @@ if (badge) badge.textContent = data.length;
 }
 
 async function sendChat() {
-  const name = document.getElementById("chatName").value.trim();
-  const message = document.getElementById("chatMessage").value.trim();
+  const nameInput = document.getElementById("chatName");
+  const messageInput = document.getElementById("chatMessage");
 
-  if (!name || !message) return;
+  const name = nameInput.value.trim();
+  const message = messageInput.value.trim();
 
-  await supabaseFetch("chat_messages", {
+  if (!name || !message) {
+    alert("Enter your name and message first.");
+    return;
+  }
+
+  const res = await supabaseFetch("chat_messages", {
     method: "POST",
     body: JSON.stringify({
   player_name: name,
-  message
+  message: message
 })
+    console.log("Chat response:", res);
+    })
   });
 
-  document.getElementById("chatMessage").value = "";
+  if (!res.ok) {
+    const errorText = await res.text();
+    alert("Chat message could not be sent.");
+    console.error("Chat send error:", errorText);
+    return;
+  }
 
-  loadChat();
+  messageInput.value = "";
+  await loadChat();
 }
 async function loadParticipants() {
   const el = document.getElementById("participantsData");
