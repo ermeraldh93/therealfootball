@@ -703,8 +703,32 @@ async function loadAdminResults() {
 async function saveResult(matchId) {
   const msg = document.getElementById("adminMessage");
   const value = document.getElementById(`result-${matchId}`).value;
-  if (!value) return;
+
+  if (!value) {
+    const clearRes = await fetch(`${SUPABASE_URL}/rest/v1/results?match_id=eq.${matchId}`, {
+      method: "DELETE",
+      headers: {
+        "apikey": SUPABASE_KEY,
+        "Authorization": `Bearer ${SUPABASE_KEY}`,
+        "Content-Type": "application/json"
+      }
+    });
+
+    if (!clearRes.ok) {
+      msg.textContent = "⚠️ Could not clear result.";
+      msg.className = "error";
+      return;
+    }
+
+    msg.textContent = `✅ Result cleared for ${matchId}.`;
+    msg.className = "success";
+    loadLeaderboard();
+    loadGoatTracker();
+    return;
+  }
+
   const payload = { match_id: matchId, winning_team: value };
+
   const res = await fetch(`${SUPABASE_URL}/rest/v1/results?on_conflict=match_id`, {
     method: "POST",
     headers: {
@@ -715,14 +739,17 @@ async function saveResult(matchId) {
     },
     body: JSON.stringify(payload)
   });
+
   if (!res.ok) {
     msg.textContent = "⚠️ Could not save result.";
     msg.className = "error";
     return;
   }
+
   msg.textContent = `✅ Result saved for ${matchId}.`;
   msg.className = "success";
   loadLeaderboard();
+  loadGoatTracker();
 }
 function toggleChat() {
   document.getElementById("chatPopup").classList.toggle("hidden");
