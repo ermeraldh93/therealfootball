@@ -677,29 +677,34 @@ function unlockAdmin() {
 async function loadAdminResults() {
   const el = document.getElementById("adminResultsData");
   el.innerHTML = "Loading result entry...";
+
   const [matchRes, resultRes] = await Promise.all([
-    supabaseFetch("matches?select=*&match_number=gte.89&match_number=lte.96&order=match_number.asc")
+    supabaseFetch("matches?select=*&match_number=gte.89&match_number=lte.96&order=match_number.asc"),
     supabaseFetch("results?select=match_id,winning_team")
   ]);
+
   const matches = await matchRes.json();
   const results = await resultRes.json();
+
   const resultMap = {};
-  if (Array.isArray(results)) results.forEach(r => resultMap[r.match_id] = r.winning_team);
+  if (Array.isArray(results)) {
+    results.forEach(r => resultMap[r.match_id] = r.winning_team);
+  }
 
   el.innerHTML = matches.map(match => {
     const current = resultMap[match.id] || "";
     const options = [match.team_a, match.allow_draw ? "Draw" : null, match.team_b].filter(Boolean);
+
     return `<div class="admin-match">
       <strong>M${match.match_number}:</strong> ${teamLabel(match.team_a)} vs ${teamLabel(match.team_b)}
       <select id="result-${match.id}">
         <option value="">No result yet</option>
-        ${options.map(o => `<option value="${escapeHtml(o)}" ${current === o ? "selected" : ""}>${flags[o] || "⚽"} ${escapeHtml(o)}</option>`).join("")}
+        ${options.map(o => `<option value="${escapeHtml(o)}" ${current === o ? "selected" : ""}>${escapeHtml(o)}</option>`).join("")}
       </select>
       <button onclick="saveResult('${match.id}')">Save Result</button>
     </div>`;
   }).join("");
 }
-
 async function saveResult(matchId) {
   const msg = document.getElementById("adminMessage");
   const value = document.getElementById(`result-${matchId}`).value;
