@@ -297,7 +297,7 @@ async function loadPickForm() {
 
   currentParticipant = participants[0];
 
-  const mRes = await supabaseFetch("matches?select=*&match_number=gte.89&match_number=lte.96&order=match_number.asc");
+  const mRes = await supabaseFetch("matches?select=*&match_number=gte.97&match_number=lte.100&order=match_number.asc");
   currentMatches = await mRes.json();
 
   const existingRes = await supabaseFetch(`picks?select=match_id,selected_team&participant_id=eq.${currentParticipant.id}`);
@@ -602,7 +602,7 @@ async function loadCrowdPredictions() {
   const el = document.getElementById("crowdPredictionsData");
   el.innerHTML = "Loading...";
 
-  const res = await supabaseFetch("public_picks?select=*&match_number=gte.89&match_number=lte.96&order=match_number.asc");
+  const res = await supabaseFetch("public_picks?select=*&match_number=gte.97&match_number=lte.100&order=match_number.asc");
   const data = await res.json();
 
   if (!Array.isArray(data) || data.length === 0) {
@@ -679,7 +679,7 @@ async function loadAdminResults() {
   el.innerHTML = "Loading result entry...";
 
   const [matchRes, resultRes] = await Promise.all([
-    supabaseFetch("matches?select=*&match_number=gte.89&match_number=lte.96&order=match_number.asc"),
+    supabaseFetch("matches?select=*&match_number=gte.97&match_number=lte.100&order=match_number.asc"),
     supabaseFetch("results?select=match_id,winning_team")
   ]);
 
